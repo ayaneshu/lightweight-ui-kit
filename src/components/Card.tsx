@@ -169,14 +169,14 @@ export function ThumbnailCard({
         className,
       )}
     >
-      {/* rounded-t-[19px]: inside a 1px border, matching the outer 20px leaves a
+      {/* rounded-t-[calc(var(--radius-tile)-1px)]: inside a 1px border, matching the outer 20px leaves a
           hairline of card showing at the corners. */}
       {href ? (
-        <a href={href} tabIndex={-1} aria-hidden="true" className="block aspect-[17/6] w-full overflow-hidden rounded-t-[19px] bg-ink/[0.03]">
+        <a href={href} tabIndex={-1} aria-hidden="true" className="block aspect-[17/6] w-full overflow-hidden rounded-t-[calc(var(--radius-tile)-1px)] bg-ink/[0.03]">
           <Zoom>{thumbnail}</Zoom>
         </a>
       ) : (
-        <div className="aspect-[17/6] w-full overflow-hidden rounded-t-[19px] bg-ink/[0.03]">
+        <div className="aspect-[17/6] w-full overflow-hidden rounded-t-[calc(var(--radius-tile)-1px)] bg-ink/[0.03]">
           <Zoom>{thumbnail}</Zoom>
         </div>
       )}

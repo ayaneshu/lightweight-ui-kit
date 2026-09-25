@@ -125,7 +125,7 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
             {children}
           </div>
           {controls && (
-            <div className="m-1.5 space-y-4 rounded-[16px] bg-card p-4 shadow-hairline">
+            <div className="m-1.5 space-y-4 rounded-2xl bg-card p-4 shadow-hairline">
               <p className="text-micro font-semibold uppercase tracking-[0.06em] text-muted">Props</p>
               {controls}
             </div>
@@ -146,7 +146,7 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
               <CopyButton text={code} />
             </div>
             {showCode && (
-              <div className="u-swap overflow-hidden rounded-[16px] bg-card shadow-hairline">
+              <div className="u-swap overflow-hidden rounded-2xl bg-card shadow-hairline">
                 <CodeView code={code} />
               </div>
             )}

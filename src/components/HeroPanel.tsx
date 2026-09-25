@@ -45,7 +45,7 @@ export function HeroPanel({ bg, src, alt, dither, pixelSize, levels, padding = 4
             alt={alt}
             onClick={onExpand}
             className={cn(
-              'relative block max-h-full max-w-full rounded-[18px] object-contain outline outline-1 -outline-offset-1 outline-black/10',
+              'relative block max-h-full max-w-full rounded-[calc(var(--radius-2xl)*1.125)] object-contain outline outline-1 -outline-offset-1 outline-black/10',
               onExpand && 'cursor-zoom-in',
             )}
           />
