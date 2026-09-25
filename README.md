@@ -100,7 +100,7 @@ npm run dev               # playground on http://localhost:5173
 | `npm run build:playground` | A static playground in `playground/dist/`. It uses hash routing, so you can host it anywhere. |
 | `npm run typecheck` | Typechecks the kit and the playground. |
 
-Push to `main` and `.github/workflows/playground.yml` publishes the playground to GitHub Pages. To turn this on, go to Settings → Pages → Source and choose "GitHub Actions".
+The playground is hosted on Vercel at [lightweight-ui-kit.vercel.app](https://lightweight-ui-kit.vercel.app). `vercel.json` sets the build, so deploying is `vercel deploy --prod` from the repo root.
 
 ---
 
