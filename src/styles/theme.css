@@ -1,0 +1,725 @@
+/* ===========================================================================
+   Lightweight UI — theme
+
+   The design tokens as a Tailwind v4 theme, light and dark, plus the handful
+   of classes the components rely on (motion, press feedback, circles).
+
+   Tailwind v4 projects:   @import "lightweight-ui/theme.css";
+   Everyone else:          import "lightweight-ui/styles.css" (already includes this)
+
+   Every colour is written once, as light-dark(light, dark), and resolves from
+   the element's `color-scheme`. Switching theme is therefore one attribute:
+
+     <html data-theme="light | dark | system">     (or class="dark")
+
+   and it works on any subtree too — a dark section inside a light page.
+   `@theme static` emits every variable, so `var(--color-ink)` works anywhere.
+   =========================================================================== */
+
+@import './fonts.css';
+
+/* Consumers' own `dark:` utilities follow the same switch. */
+@custom-variant dark (&:where(.dark, .dark *, [data-theme='dark'], [data-theme='dark'] *));
+
+@theme static {
+  /* ---------------------------------------------------------------- Type */
+
+  /* Geist for the UI. Override --lui-font-sans to hand it a next/font
+     variable instead of the bundled file. */
+  --font-sans: var(--lui-font-sans, 'Geist'), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+  /* Display face — Geist Pixel Square, one weight (500). Headings over 20px
+     only: its square terminals carry a 40px title and turn to mush below. */
+  --font-pixel: var(--lui-font-pixel, 'Geist Pixel Square'), 'Geist Mono', ui-monospace, SFMono-Regular,
+    Menlo, monospace;
+  --font-mono: var(--lui-font-mono, 'Geist Mono'), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* The type scale, named by job. Each step carries its own line-height, so
+     text never inherits leading from whatever it happens to sit in. */
+  --text-micro: 11px; /* table headers, avatar initials, count pills */
+  --text-micro--line-height: 1.5;
+  --text-caption: 12px; /* chart labels, timestamps, legend tags */
+  --text-caption--line-height: 1.5;
+  --text-label: 13px; /* secondary copy, small buttons, field labels */
+  --text-label--line-height: 1.5;
+  --text-ui: 14px; /* controls, buttons, menu rows, default UI */
+  --text-ui--line-height: 1.5;
+  --text-body: 15px; /* reading copy, option names */
+  --text-body--line-height: 1.625;
+  --text-title: 17px; /* card & dialog titles — still Geist Sans */
+  --text-title--line-height: 1.375;
+  --text-stat: 19px; /* inline counts */
+  --text-stat--line-height: 1.2;
+  --text-display-xs: 24px; /* page titles on phones (pixel) */
+  --text-display-xs--line-height: 1.25;
+  --text-display-sm: 28px; /* page titles (pixel) */
+  --text-display-sm--line-height: 1.2;
+  --text-display: 32px; /* hero headlines (pixel) */
+  --text-display--line-height: 1.15;
+  --text-display-lg: 40px; /* workspace titles (pixel) */
+  --text-display-lg--line-height: 1.1;
+  --text-figure: 52px; /* the one number a report leads with (pixel) */
+  --text-figure--line-height: 1;
+
+  /* ------------------------------------------------------------- Colour */
+
+  /* Surfaces */
+  --color-bg: light-dark(#ffffff, #111214); /* the page */
+  --color-card: light-dark(#ffffff, #18191c); /* cards, menus, dialogs */
+  --color-raised: light-dark(#ffffff, #2a2b30); /* the chosen segment on a track */
+  --color-field: light-dark(#ffffff, #1d1e22); /* inputs */
+
+  /* Content */
+  --color-ink: light-dark(#18191d, #ececee); /* text, primary fills, selection */
+  --color-on-ink: light-dark(#ffffff, #111214); /* text on an ink fill */
+  --color-muted: light-dark(#666879, #9c9fad); /* secondary text — ≥4.5:1 on every wash */
+
+  /* Lines */
+  --color-line: light-dark(#ededec, #2a2b30); /* card edges, dividers */
+  --color-line-strong: light-dark(#e3e3e0, #34353b); /* outlined buttons, dashed wells */
+  --color-line-control: light-dark(#949494, #6c6e78); /* edges that identify a control — 3:1 */
+
+  /* Constant darks for things drawn on media, which don't follow the theme. */
+  --color-shade: #18191d;
+  --color-scrim: light-dark(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.6));
+
+  /* Form state — muted so they sit inside the palette rather than shout. */
+  --color-draft: light-dark(#96660b, #e4b660);
+  --color-draft-bg: light-dark(#fbf3e3, #2c2413);
+  --color-open: light-dark(#15803d, #62d38e);
+  --color-open-bg: light-dark(#eaf7ee, #13291c);
+  --color-closed: light-dark(#666879, #9c9fad);
+  --color-closed-bg: light-dark(#f2f2f1, #232428);
+
+  /* Destructive actions and validation. `danger` for text and edges,
+     `danger-solid` behind white text, `danger-strong` for text on the tint. */
+  --color-danger: light-dark(#da2424, #ff7b76);
+  --color-danger-solid: light-dark(#da2424, #dc2626);
+  --color-danger-strong: light-dark(#b91c1c, #ffa19c);
+  --color-danger-bg: light-dark(#fef2f2, #301618);
+  --color-danger-line: light-dark(#fecaca, #5a2226);
+
+  /* Washes — ink at low alpha over whatever surface is below: black on light,
+     white on dark. Hover, pressed, tracks and empty wells; never a grey hex. */
+  --color-wash-1: color-mix(in oklab, var(--color-ink) 1.5%, transparent); /* empty wells */
+  --color-wash-2: color-mix(in oklab, var(--color-ink) 3%, transparent); /* outlined hover, tracks */
+  --color-wash-3: color-mix(in oklab, var(--color-ink) 4%, transparent); /* ghost hover, search */
+  --color-wash-4: color-mix(in oklab, var(--color-ink) 6%, transparent); /* selected rows, pills */
+  --color-wash-5: color-mix(in oklab, var(--color-ink) 8%, transparent); /* soft hover, chips */
+  --color-wash-6: color-mix(in oklab, var(--color-ink) 12%, transparent); /* switch track (off) */
+
+  /* Charts — option identity (categorical) and ordered ramp (ratings). Same in
+     both themes: every fill clears 3:1 against the dark card too. */
+  --color-chart-1: #277fff;
+  --color-chart-2: #1baf7a;
+  --color-chart-3: #eda100;
+  --color-chart-4: #008300;
+  --color-ramp-1: #a4c9ff;
+  --color-ramp-2: #6fabff;
+  --color-ramp-3: #277fff;
+  --color-ramp-4: #0260d9;
+  --color-ramp-5: #0347a2;
+
+  /* Avatar fills — every one carries white initials at ≥4.5:1. */
+  --color-avatar-1: #4f46e5;
+  --color-avatar-2: #e11d48;
+  --color-avatar-3: #0081a2;
+  --color-avatar-4: #b45309;
+  --color-avatar-5: #7c3aed;
+  --color-avatar-6: #00875b;
+  --color-avatar-7: #db2777;
+  --color-avatar-8: #00857a;
+
+  /* ------------------------------------------------------------- Radius */
+
+  /* Tailwind's own lg (8) / xl (12) / 2xl (16) stay; these fill the gaps. */
+  --radius-chip: 10px; /* menu rows, inner tabs, chart marks */
+  --radius-control: 14px; /* segmented tracks, menus, compact buttons */
+  --radius-tile: 20px; /* dashboard cards, option cards, nudges */
+  --radius-panel: 22px; /* chart cards, confirm dialogs, date picker */
+  --radius-sheet: 26px; /* dialogs, feature cards, empty states */
+  --radius-canvas: 28px; /* the builder canvas */
+  --radius-device: 38px; /* phone-frame prototypes */
+
+  /* ------------------------------------------------------------ Shadow */
+
+  /* Soft and long in light; in dark, where a black shadow can't be seen, a
+     faint white ring does the lifting instead. Values live in --lui-shadow-*
+     below so each can switch with the theme. */
+  --shadow-hairline: var(--lui-shadow-hairline);
+  --shadow-pill: var(--lui-shadow-pill);
+  --shadow-card: var(--lui-shadow-card);
+  --shadow-menu: var(--lui-shadow-menu);
+  --shadow-modal: var(--lui-shadow-modal);
+  --shadow-lift: var(--lui-shadow-lift);
+  --shadow-nudge: var(--lui-shadow-nudge);
+  --shadow-toast: var(--lui-shadow-toast);
+  --shadow-tooltip: var(--lui-shadow-tooltip);
+  --shadow-float: var(--lui-shadow-float);
+
+  /* ------------------------------------------------------------- Motion */
+
+  /* Strong custom curves — the built-in CSS easings are too weak. These
+     replace Tailwind's ease-out / ease-in-out and become the default for every
+     transition-* utility, so the whole UI is snappy by default. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --default-transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+  --default-transition-duration: 180ms;
+}
+
+/* ------------------------------------------------------------ Theme switch */
+
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+}
+:root.dark,
+.dark,
+[data-theme='dark'] {
+  color-scheme: dark;
+}
+[data-theme='system'] {
+  color-scheme: light dark;
+}
+
+:root {
+  /* Corner smoothing for every rounded box (applied in base.css). The default,
+     superellipse(4), reads close to square at small radii in current Chromium;
+     `squircle` is the softer, iOS-like curve and `round` turns it off. */
+  --lui-corner-shape: superellipse(4);
+
+  --lui-shadow-hairline: 0 1px 2px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.5));
+  --lui-shadow-pill: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.5)),
+    0 1px 1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3));
+  --lui-shadow-card: 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.04)),
+    0 1px 2px light-dark(rgb(0 0 0 / 0.03), rgb(0 0 0 / 0.4)),
+    0 16px 44px -24px light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.7));
+  --lui-shadow-menu: 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.05)),
+    0 4px 12px -2px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.5)),
+    0 16px 40px -12px light-dark(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.7));
+  --lui-shadow-modal: 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.06)),
+    0 1px 2px light-dark(rgb(0 0 0 / 0.03), rgb(0 0 0 / 0.4)),
+    0 24px 60px -24px light-dark(rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.8));
+  --lui-shadow-lift: 0 2px 10px -2px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.5)),
+    0 18px 44px -20px light-dark(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.8));
+  --lui-shadow-nudge: 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.05)),
+    0 2px 8px -2px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.5)),
+    0 20px 48px -16px light-dark(rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.8));
+  --lui-shadow-toast: 0 12px 32px -12px light-dark(rgb(0 0 0 / 0.32), rgb(0 0 0 / 0.8));
+  --lui-shadow-tooltip: 0 4px 12px -4px light-dark(rgb(0 0 0 / 0.4), rgb(0 0 0 / 0.8));
+  --lui-shadow-float: 0 2px 8px -2px rgb(0 0 0 / 0.4);
+
+  /* Durations and layers aren't Tailwind namespaces, but they're part of the
+     system, so they're published as variables for anyone building on it. */
+  --lui-duration-press: 160ms;
+  --lui-duration-tooltip: 125ms;
+  --lui-duration-popover: 150ms;
+  --lui-duration-exit: 120ms;
+  --lui-duration-swap: 180ms;
+  --lui-duration-overlay: 200ms;
+  --lui-duration-modal: 220ms;
+  --lui-duration-slide: 240ms;
+  --lui-duration-view: 240ms;
+  --lui-duration-stagger: 300ms;
+  --lui-duration-rise: 360ms;
+  --lui-duration-pop: 380ms;
+  --lui-duration-chart: 400ms;
+
+  --lui-z-header: 40;
+  --lui-z-popover: 50;
+  --lui-z-dialog: 60;
+  --lui-z-lightbox: 70;
+  --lui-z-toast: 80;
+  --lui-z-menu: 200;
+}
+
+/* Keyboard focus: a 2px ring in ink — the kit's own colour rather than the
+   browser's blue — with room to breathe. Text fields opt out and show focus
+   with their border or background instead (see fieldClasses). Forced-colours
+   mode still draws the system ring. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--lui-focus-ring, var(--color-ink));
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Opt out of corner smoothing for true circles — an avatar, a status dot.
+     On a square with a full radius, superellipse renders a visible squircle. */
+  .u-circle {
+    corner-shape: round;
+  }
+
+  /* Press feedback — pressable things scale to 0.97 while held so the UI
+     feels like it's listening. Only the properties that change transition.
+     aria-disabled counts as disabled; data-static opts a wide control out,
+     where the same percentage would move its edges too far. */
+  .u-press {
+    transition-property: transform, scale, translate, color, background-color, border-color, opacity, box-shadow;
+    transition-duration: var(--lui-duration-press);
+    transition-timing-function: var(--ease-out);
+  }
+  .u-press:not(:disabled):not([aria-disabled='true']):not([data-static]):active {
+    transform: scale(0.97);
+  }
+
+  /* Origin-aware entrances: modals scale from centre, popovers from their
+     trigger edge. Nothing appears from scale(0) — always 0.96 + opacity.
+     Exits (data-closing) are shorter and softer than entrances. */
+  .u-overlay {
+    transition: opacity var(--lui-duration-overlay) var(--ease-out);
+  }
+  .u-modal {
+    transition:
+      opacity var(--lui-duration-modal) var(--ease-out),
+      transform var(--lui-duration-modal) var(--ease-out);
+  }
+  .u-popover {
+    transition:
+      opacity var(--lui-duration-popover) var(--ease-out),
+      transform var(--lui-duration-popover) var(--ease-out);
+  }
+  /* A toast arrives from the edge it lives on, and leaves the same way. */
+  .u-toast {
+    transition:
+      opacity 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
+  }
+  @starting-style {
+    .u-overlay {
+      opacity: 0;
+    }
+    .u-modal,
+    .u-popover {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    .u-toast {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+  .u-overlay[data-closing],
+  .u-modal[data-closing],
+  .u-popover[data-closing],
+  .u-toast[data-closing] {
+    opacity: 0;
+    transition-duration: var(--lui-duration-exit);
+    pointer-events: none;
+  }
+  .u-modal[data-closing],
+  .u-popover[data-closing] {
+    transform: scale(0.98);
+  }
+  .u-toast[data-closing] {
+    transform: translateY(6px);
+  }
+  /* Once one tooltip is open, the next opens instantly — no delay, no fade. */
+  .u-popover[data-instant] {
+    transition-duration: 0ms;
+  }
+
+  /* A glyph that appears on a state change (a tick, "Copied") scales in from
+     0.25 with a blur rather than popping. */
+  .u-icon-in {
+    transition:
+      opacity 300ms cubic-bezier(0.2, 0, 0, 1),
+      scale 300ms cubic-bezier(0.2, 0, 0, 1),
+      filter 300ms cubic-bezier(0.2, 0, 0, 1);
+  }
+  @starting-style {
+    .u-icon-in {
+      opacity: 0;
+      scale: 0.25;
+      filter: blur(4px);
+    }
+  }
+
+  /* Content swap — crossfade + tiny rise when a keyed region's content changes. */
+  .u-swap {
+    transition:
+      opacity var(--lui-duration-swap) var(--ease-out),
+      transform var(--lui-duration-swap) var(--ease-out);
+  }
+  @starting-style {
+    .u-swap {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+
+  /* Staggered list entrance — 45ms apart, capped, never blocking input. */
+  .u-stagger > * {
+    animation: u-fade-up var(--lui-duration-stagger) var(--ease-out) backwards;
+  }
+  .u-stagger > *:nth-child(2) {
+    animation-delay: 45ms;
+  }
+  .u-stagger > *:nth-child(3) {
+    animation-delay: 90ms;
+  }
+  .u-stagger > *:nth-child(4) {
+    animation-delay: 135ms;
+  }
+  .u-stagger > *:nth-child(5) {
+    animation-delay: 180ms;
+  }
+  .u-stagger > *:nth-child(6) {
+    animation-delay: 225ms;
+  }
+  .u-stagger > *:nth-child(n + 7) {
+    animation-delay: 270ms;
+  }
+
+  /* Celebratory pop — reserved for rare, first-time moments. */
+  .u-pop {
+    animation: u-pop var(--lui-duration-pop) var(--ease-out) backwards;
+  }
+
+  /* Attention flash — two quick pulses to point at something, then settle. */
+  .u-flash {
+    animation: u-flash 1000ms var(--ease-out);
+  }
+
+  /* Entrances fill backwards, never forwards: once they finish, no transform is
+     left on the element. A held transform — even an identity one — would make
+     it the containing block for every position: fixed descendant. */
+
+  /* Screen-to-screen — the incoming screen rises and fades in. */
+  .u-rise {
+    animation: u-rise var(--lui-duration-rise) var(--ease-out) backwards;
+  }
+
+  /* View switch inside one screen — shorter and shallower than u-rise. */
+  .u-view {
+    animation: u-view var(--lui-duration-view) var(--ease-out) backwards;
+  }
+
+  /* Checkbox — the native input, drawn by the kit. Pressing squeezes the box;
+     checking fills it and the tick draws itself along its own path (pathLength
+     1), a beat after the fill. Unchecking is quicker than checking. A pop plays
+     only after a real change (data-touched), never on page load. */
+  .u-checkbox {
+    appearance: none;
+    margin: 0;
+    transition-property: background-color, border-color, scale, box-shadow;
+    transition-duration: 160ms;
+    transition-timing-function: var(--ease-out);
+  }
+  .u-checkbox:not(:disabled):active {
+    scale: 0.86;
+  }
+  .u-checkbox[data-touched]:checked,
+  .u-checkbox[data-touched]:indeterminate {
+    animation: u-check-pop 340ms var(--ease-out);
+  }
+  .u-check path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 90ms var(--ease-out);
+  }
+  .u-checkbox:checked:not(:indeterminate) + .u-check .u-check-tick,
+  .u-checkbox:indeterminate + .u-check .u-check-dash {
+    stroke-dashoffset: 0;
+    transition-duration: 260ms;
+    transition-delay: 50ms;
+  }
+
+  /* Range — a 4px track filled in ink up to the value (--lui-range, set by
+     Slider), and a white thumb that grows under the pointer and while dragged.
+     Keyboard focus rings the thumb, not the whole input. */
+  .u-range {
+    --lui-range: 50%;
+    appearance: none;
+    height: 20px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .u-range:focus-visible {
+    outline: none;
+  }
+  .u-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--color-ink) var(--lui-range), var(--color-wash-6) var(--lui-range));
+  }
+  .u-range:dir(rtl)::-webkit-slider-runnable-track {
+    background: linear-gradient(to left, var(--color-ink) var(--lui-range), var(--color-wash-6) var(--lui-range));
+  }
+  .u-range::-moz-range-track {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-wash-6);
+  }
+  .u-range::-moz-range-progress {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--color-ink);
+  }
+  .u-range::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    margin-top: -6px;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px var(--color-line-control),
+      0 1px 3px rgb(0 0 0 / 0.25);
+    transition:
+      scale 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out);
+  }
+  .u-range::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: 0;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px var(--color-line-control),
+      0 1px 3px rgb(0 0 0 / 0.25);
+    transition:
+      scale 160ms var(--ease-out),
+      box-shadow 160ms var(--ease-out);
+  }
+  .u-range:not(:disabled):hover::-webkit-slider-thumb {
+    scale: 1.15;
+  }
+  .u-range:not(:disabled):hover::-moz-range-thumb {
+    scale: 1.15;
+  }
+  .u-range:not(:disabled):active::-webkit-slider-thumb {
+    scale: 1.25;
+    box-shadow:
+      0 0 0 1px var(--color-ink),
+      0 0 0 6px color-mix(in oklab, var(--color-ink) 10%, transparent);
+  }
+  .u-range:not(:disabled):active::-moz-range-thumb {
+    scale: 1.25;
+    box-shadow:
+      0 0 0 1px var(--color-ink),
+      0 0 0 6px color-mix(in oklab, var(--color-ink) 10%, transparent);
+  }
+  .u-range:focus-visible::-webkit-slider-thumb {
+    box-shadow:
+      0 0 0 2px var(--color-bg),
+      0 0 0 4px var(--color-ink);
+  }
+  .u-range:focus-visible::-moz-range-thumb {
+    box-shadow:
+      0 0 0 2px var(--color-bg),
+      0 0 0 4px var(--color-ink);
+  }
+
+  /* Loaders. The pixel grid breathes in a diagonal wave — a nod to the pixel
+     display face and the dithered backdrops. Dots bounce; the bar sweeps.
+     Under reduced motion the grid and dots only fade; nothing travels. */
+  .u-loader-pixel > * {
+    animation: u-loader-pixel 1000ms ease-in-out infinite both;
+  }
+  .u-loader-dots > * {
+    animation: u-loader-dot 900ms var(--ease-in-out) infinite both;
+  }
+  .u-loader-bar {
+    animation: u-loader-bar 1400ms var(--ease-in-out) infinite;
+  }
+
+  /* Hover delight — a bell that rings, a glyph that nudges. Pointer hover only
+     (Tailwind's hover variant already skips touch), and dropped entirely under
+     reduced motion. */
+  .u-wiggle {
+    transform-origin: 50% 10%;
+  }
+  .group:hover .u-wiggle,
+  .u-wiggle:hover {
+    animation: u-wiggle 560ms var(--ease-out);
+  }
+}
+
+/* For a field whose placeholder *is* the value in force (a generated default
+   the user can override). Lighter than typed text, darker than a hint.
+   Unlayered on purpose: it has to beat the inline fields' own placeholder
+   utility, and unlayered rules outrank every layer. */
+.u-placeholder-strong::placeholder {
+  color: color-mix(in oklab, var(--color-ink) 70%, transparent);
+}
+
+@keyframes u-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes u-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes u-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.06);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes u-loader-pixel {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  45% {
+    opacity: 1;
+  }
+}
+
+@keyframes u-loader-dot {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  35% {
+    transform: translateY(-45%);
+    opacity: 1;
+  }
+}
+
+@keyframes u-loader-bar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes u-loader-fade {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes u-check-pop {
+  0% {
+    scale: 0.86;
+  }
+  55% {
+    scale: 1.1;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes u-wiggle {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  20% {
+    rotate: 14deg;
+  }
+  40% {
+    rotate: -10deg;
+  }
+  60% {
+    rotate: 6deg;
+  }
+  80% {
+    rotate: -3deg;
+  }
+}
+
+@keyframes u-flash {
+  0%,
+  30%,
+  100% {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+  15%,
+  45% {
+    background-color: color-mix(in oklab, var(--color-ink) 6%, transparent);
+    box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--color-ink) 28%, transparent);
+  }
+}
+
+@keyframes u-rise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes u-view {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Reduced motion means reduced, not removed: movement goes, fades stay.
+   This lives here — the file every consumer loads — and it's unlayered with
+   !important so it beats utilities and inline styles alike.
+     • Transitions keep only opacity and colour; transforms apply instantly.
+     • Entrances that travel become plain fades; spinners keep turning.
+     • Press scale is dropped. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-property: opacity, color, background-color, border-color, outline-color, box-shadow, fill, stroke !important;
+    scroll-behavior: auto !important;
+  }
+  .u-rise,
+  .u-view,
+  .u-pop,
+  .u-stagger > * {
+    animation-name: u-fade !important;
+    animation-delay: 0ms !important;
+  }
+  .u-flash,
+  .u-wiggle,
+  .u-checkbox {
+    animation: none !important;
+  }
+  .u-loader-dots > * {
+    animation-name: u-loader-fade !important;
+  }
+  .u-press:active,
+  button:active,
+  [role='button']:active {
+    transform: none !important;
+  }
+}

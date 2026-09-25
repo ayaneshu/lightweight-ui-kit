@@ -1,0 +1,10 @@
+/* Build entry for the precompiled lightweight-ui/styles.css — Tailwind's reset, the
+   Lightweight UI theme and base, and every utility the components use. Consumers who
+   don't run Tailwind import the output of this and nothing else. */
+
+@import 'tailwindcss';
+@import './theme.css';
+@import './base.css';
+
+@source '../components';
+@source '../lib';
