@@ -1,0 +1,129 @@
+/* The playground consumes the kit the way a Tailwind v4 project would:
+   theme + base, and a @source pointing at the components. */
+@import 'tailwindcss';
+@import '../../src/styles/theme.css';
+@import '../../src/styles/base.css';
+
+@source '../../src';
+@source './';
+
+@theme {
+  /* Syntax colours for code samples — each ≥4.5:1 on the card in its theme. */
+  --color-code-string: light-dark(#1c5cab, #8dbdf5);
+  --color-code-keyword: light-dark(#7b4fd8, #b9a6ff);
+  --color-code-attr: light-dark(#8a5f10, #e4b660);
+}
+
+html {
+  scroll-padding-top: 80px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Checkerboard for previews that need to show transparency. */
+.pg-checker {
+  --pg-check: light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.05));
+  background-image:
+    linear-gradient(45deg, var(--pg-check) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--pg-check) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--pg-check) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--pg-check) 75%);
+  background-size: 16px 16px;
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+}
+
+/* Dot grid behind demo stages — reads as a canvas without competing. It sits
+   on the demo's tray, so it brings no fill of its own. */
+.pg-stage {
+  background-image: radial-gradient(light-dark(rgb(0 0 0 / 0.07), rgb(255 255 255 / 0.07)) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Page transitions (View Transitions API). Only the page and the sidebar's
+   active pill take part; the rest of the chrome holds still. The old page
+   lifts away quickly, the new one settles in a beat later — exits shorter
+   than entrances. Reduced motion skips the transition entirely (App.tsx). */
+.pg-page {
+  view-transition-name: page;
+}
+.pg-nav-pill {
+  view-transition-name: nav-pill;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(page) {
+  animation: none;
+}
+::view-transition-old(page) {
+  animation: pg-page-out 140ms var(--ease-out) both;
+}
+::view-transition-new(page) {
+  animation: pg-page-in 280ms var(--ease-out) 60ms both;
+}
+::view-transition-group(nav-pill) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-out);
+}
+::view-transition-old(nav-pill) {
+  display: none;
+}
+::view-transition-new(nav-pill) {
+  animation: none;
+}
+@keyframes pg-page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes pg-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* The Overview's "Explore the kit" arrow: a slow nudge toward what's below. */
+@media (prefers-reduced-motion: no-preference) {
+  .u-scroll-cue {
+    animation: pg-cue 1800ms var(--ease-in-out) infinite;
+  }
+}
+@keyframes pg-cue {
+  0%,
+  60%,
+  100% {
+    translate: 0 0;
+  }
+  30% {
+    translate: 0 4px;
+  }
+}
+
+/* Sign in: the product glimpse floats, gently, out of step with itself. */
+@media (prefers-reduced-motion: no-preference) {
+  .pg-float {
+    animation: pg-float 6s var(--ease-in-out) infinite;
+  }
+  .pg-float-late {
+    animation: pg-float 6s var(--ease-in-out) -2.4s infinite;
+  }
+}
+@keyframes pg-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -6px;
+  }
+}

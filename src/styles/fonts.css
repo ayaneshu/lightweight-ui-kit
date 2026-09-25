@@ -1,0 +1,37 @@
+/* ---------------------------------------------------------------------------
+   Lightweight UI typefaces — bundled so the kit renders the same without next/font.
+
+   Geist             the UI face: every label, control, body line and number.
+   Geist Pixel Sq.   the display face: headings over 20px and hero figures.
+                     Ships one weight (500); `font-semibold` thickens it
+                     synthetically, which is how the kit sets its titles.
+   Geist Mono        code and ids.
+
+   All three are © Vercel, licensed under the SIL Open Font License 1.1 — see
+   fonts/OFL.txt. Using next/font already? Point the tokens at your variables
+   instead (see README → Fonts) and skip this file.
+   --------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Geist';
+  src: url('./fonts/Geist-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Pixel Square';
+  src: url('./fonts/GeistPixel-Square.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('./fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}

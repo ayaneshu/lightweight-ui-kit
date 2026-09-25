@@ -1,0 +1,69 @@
+/* ===========================================================================
+   Lightweight UI — base
+
+   The global opinions: page colours and face, display face on headings,
+   corner smoothing on every rounded box and press feedback on every button.
+   Optional — the components carry their own styles, focus, dark mode and
+   reduced motion without it — but this is what makes a whole page feel like
+   Lightweight UI rather than a page with Lightweight UI components on it.
+
+   Included in lightweight-ui/styles.css. Tailwind v4 projects: @import "lightweight-ui/base.css";
+   =========================================================================== */
+
+@layer base {
+  body {
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Every heading renders in the pixel display face — as an element rule so new
+     headings inherit it. Layered on purpose: a `font-sans` utility can still
+     opt a heading out, which every heading of 20px or under should do. The
+     face ships one weight, so headings use it rather than a faked bold. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-pixel);
+    font-weight: 500;
+  }
+
+  /* Corner smoothing on every rounded element — see --lui-corner-shape in
+     theme.css. Progressive enhancement: browsers without `corner-shape` just
+     render normal rounding. `.u-circle` opts a true circle back out. */
+  *,
+  *::before,
+  *::after {
+    corner-shape: var(--lui-corner-shape, superellipse(4));
+  }
+
+  /* Universal press feedback, for buttons that aren't kit components. */
+  button,
+  [role='button'],
+  summary {
+    transition-property: transform, scale, translate, background-color, border-color, color, opacity, box-shadow;
+    transition-timing-function: var(--ease-out);
+    transition-duration: var(--lui-duration-press, 160ms);
+  }
+  button:not(:disabled):not([aria-disabled='true']):not([data-static]):active,
+  [role='button']:not([aria-disabled='true']):not([data-static]):active {
+    transform: scale(0.97);
+  }
+
+  /* Touch targets respond instantly — no double-tap-to-zoom delay. */
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  label,
+  summary,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+}
