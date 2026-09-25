@@ -94,8 +94,8 @@ export interface DemoProps {
 
 /**
  * A live example: a stage, optional knobs, and the code that produced it.
- * Drawn as one soft tray rather than a box of ruled-off parts — the knobs and
- * the code sit on inset cards, so nothing needs a line to separate it.
+ * One bordered box, with hairlines between its parts — in dark mode a fill
+ * alone can't tell the stage, the knobs and the code apart.
  */
 export function Demo({ title, description, code, controls, stage = 'dots', className, codeOpen = false, children }: DemoProps) {
   const [showCode, setShowCode] = useState(codeOpen)
@@ -111,7 +111,7 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
           )}
         </div>
       )}
-      <div className="overflow-hidden rounded-panel bg-ink/[0.03]">
+      <div className="overflow-hidden rounded-panel border border-line bg-card">
         <div className={cn('grid', controls && 'md:grid-cols-[minmax(0,1fr)_260px]')}>
           <div
             className={cn(
@@ -125,15 +125,15 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
             {children}
           </div>
           {controls && (
-            <div className="m-1.5 space-y-4 rounded-2xl bg-card p-4 shadow-hairline">
+            <div className="space-y-4 border-t border-line p-4 md:border-s md:border-t-0">
               <p className="text-micro font-semibold uppercase tracking-[0.06em] text-muted">Props</p>
               {controls}
             </div>
           )}
         </div>
         {code && (
-          <div className="px-1.5 pb-1.5">
-            <div className="flex items-center justify-between px-1.5 py-1.5">
+          <div>
+            <div className="flex items-center justify-between border-t border-line px-3 py-2">
               <button
                 type="button"
                 onClick={() => setShowCode((s) => !s)}
@@ -146,7 +146,7 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
               <CopyButton text={code} />
             </div>
             {showCode && (
-              <div className="u-swap overflow-hidden rounded-2xl bg-card shadow-hairline">
+              <div className="u-swap border-t border-line bg-ink/[0.02]">
                 <CodeView code={code} />
               </div>
             )}
@@ -184,8 +184,8 @@ export function CopyButton({ text, label = 'Copy' }: { text: string; label?: str
 /** A standalone code block with a copy button. */
 export function CodeBlock({ code, title, className }: { code: string; title?: string; className?: string }) {
   return (
-    <div className={cn('overflow-hidden rounded-2xl bg-ink/[0.03]', className)}>
-      <div className="flex items-center justify-between px-3 pt-1.5">
+    <div className={cn('overflow-hidden rounded-2xl border border-line bg-card', className)}>
+      <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
         <span className="px-1 font-mono text-caption text-muted">{title ?? ''}</span>
         <CopyButton text={code} />
       </div>
