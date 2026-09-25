@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Lightweight UI — a small React UI kit: tokens, typography, colour, motion and components.",
   "license": "MIT",
+  "author": "ayaneshu (https://github.com/ayaneshu)",
   "type": "module",
   "sideEffects": [
     "*.css"

@@ -168,4 +168,4 @@ playground/        Vite app: docs, live demos, patterns
 
 ## License
 
-The code is MIT. The Geist fonts are © Vercel and licensed under the SIL Open Font License 1.1 (see `src/styles/fonts/OFL.txt`). Icons are [Phosphor Icons](https://github.com/phosphor-icons/react), MIT-licensed. The dither kernels follow the standard definitions as catalogued in [makew0rld/dither](https://github.com/makew0rld/dither).
+Built by [ayaneshu](https://github.com/ayaneshu). The code is MIT. The Geist fonts are © Vercel and licensed under the SIL Open Font License 1.1 (see `src/styles/fonts/OFL.txt`). Icons are [Phosphor Icons](https://github.com/phosphor-icons/react), MIT-licensed. The dither kernels follow the standard definitions as catalogued in [makew0rld/dither](https://github.com/makew0rld/dither).
