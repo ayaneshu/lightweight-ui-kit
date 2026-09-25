@@ -2,6 +2,8 @@
 
 A lightweight React UI kit: tokens, typography, colour, motion and a full set of components, plus a playground that shows all of it working.
 
+**Live playground: [lightweight-ui-kit.vercel.app](https://lightweight-ui-kit.vercel.app)**
+
 Ink on paper, in light and dark. Hairlines and ink washes instead of greys. Big, smoothed corners. Geist for the interface, Geist Pixel for display. Fast motion. Icons by [Phosphor](https://phosphoricons.com).
 
 > **Where this repo lives.** The commands below install from `ayaneshu/lightweight-ui-kit`. The repo is private, so installing needs a GitHub account with access to it. If the kit moves, change that path in this README, in `bin/lightweight-ui.mjs` and in `playground/src/ui/site.ts`.

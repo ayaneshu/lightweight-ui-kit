@@ -4,6 +4,7 @@
   "description": "Lightweight UI — a small React UI kit: tokens, typography, colour, motion and components.",
   "license": "MIT",
   "author": "ayaneshu (https://github.com/ayaneshu)",
+  "homepage": "https://lightweight-ui-kit.vercel.app",
   "type": "module",
   "sideEffects": [
     "*.css"
