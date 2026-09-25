@@ -54,6 +54,7 @@
     "dev": "vite --config playground/vite.config.ts",
     "build": "tsup && node scripts/build-css.mjs",
     "build:playground": "vite build --config playground/vite.config.ts",
+    "og": "node scripts/og-image.mjs",
     "preview": "vite preview --config playground/vite.config.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p playground/tsconfig.json",
     "prepare": "npm run build"

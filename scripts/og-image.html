@@ -1,0 +1,325 @@
+<!doctype html>
+<!--
+  The link-preview card (Open Graph image), 1200×630.
+  Rendered to playground/public/og.png by `npm run og` (scripts/og-image.mjs),
+  which inlines the fonts and captures this page with headless Chrome.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: 'Geist';
+        src: url('__GEIST__') format('woff2');
+        font-weight: 100 900;
+      }
+      @font-face {
+        font-family: 'Geist Pixel';
+        src: url('__PIXEL__') format('woff2');
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: 'Geist Mono';
+        src: url('__MONO__') format('woff2');
+        font-weight: 100 900;
+      }
+
+      :root {
+        --bg: #111214;
+        --card: #18191c;
+        --ink: #ececee;
+        --muted: #9c9fad;
+        --line: #2a2b30;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: 'Geist', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      canvas {
+        position: absolute;
+        inset: 0;
+        width: 1200px;
+        height: 630px;
+        image-rendering: pixelated;
+      }
+
+      .copy {
+        position: absolute;
+        left: 80px;
+        top: 0;
+        bottom: 0;
+        width: 760px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        align-self: flex-start;
+        padding: 6px 18px 6px 6px;
+        border-radius: 999px;
+        background: rgb(236 236 238 / 0.07);
+        color: var(--muted);
+        font-size: 21px;
+      }
+      .pill b {
+        padding: 4px 12px;
+        border-radius: 999px;
+        background: var(--ink);
+        color: var(--bg);
+        font-weight: 600;
+        font-size: 18px;
+      }
+      h1 {
+        margin-top: 30px;
+        font-family: 'Geist Pixel', monospace;
+        font-weight: 500;
+        font-size: 84px;
+        line-height: 1;
+        white-space: nowrap;
+        letter-spacing: -0.01em;
+      }
+      .lede {
+        margin-top: 24px;
+        max-width: 620px;
+        font-size: 30px;
+        line-height: 1.35;
+        color: var(--muted);
+      }
+      .lede strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+      .url {
+        position: absolute;
+        left: 80px;
+        bottom: 56px;
+        font-family: 'Geist Mono', monospace;
+        font-size: 22px;
+        color: var(--muted);
+      }
+
+      /* A slice of the kit, floating on the field. */
+      .card {
+        position: absolute;
+        right: 80px;
+        top: 124px;
+        width: 360px;
+        padding: 24px;
+        border-radius: 24px;
+        background: var(--card);
+        box-shadow:
+          0 0 0 1px rgb(255 255 255 / 0.07),
+          0 30px 70px -30px rgb(0 0 0 / 0.9);
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        border-radius: 999px;
+        background: #13291c;
+        color: #62d38e;
+        font-size: 16px;
+        font-weight: 500;
+      }
+      .badge i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .faces {
+        display: flex;
+      }
+      .faces span {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        margin-left: -5px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 3px var(--card);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .title {
+        margin-top: 18px;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+      .sub {
+        margin-top: 4px;
+        font-size: 17px;
+        color: var(--muted);
+      }
+      .bar {
+        display: flex;
+        gap: 3px;
+        margin-top: 20px;
+        height: 34px;
+        border-radius: 11px;
+        overflow: hidden;
+      }
+      .bar span {
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        font-weight: 600;
+        color: #18191d;
+      }
+      .chip {
+        position: absolute;
+        right: 132px;
+        top: 420px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 18px 8px 8px;
+        border-radius: 999px;
+        background: var(--card);
+        box-shadow:
+          0 0 0 1px rgb(255 255 255 / 0.07),
+          0 20px 50px -24px rgb(0 0 0 / 0.9);
+        font-size: 17px;
+        font-weight: 500;
+      }
+      .chip i {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #1baf7a;
+        color: #fff;
+        font-style: normal;
+        font-size: 15px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="field" width="400" height="210"></canvas>
+
+    <div class="copy">
+      <span class="pill"><b>v0.1</b> Open source · MIT · React</span>
+      <h1>Lightweight UI</h1>
+      <p class="lede">A calm, fast React UI kit. <strong>100+ components</strong>, tokens and motion, in light and dark.</p>
+    </div>
+    <p class="url">lightweight-ui-kit.vercel.app</p>
+
+    <div class="card">
+      <div class="row">
+        <span class="badge"><i></i>Active</span>
+        <span class="faces">
+          <span style="background: #4f46e5">AL</span>
+          <span style="background: #e11d48">SK</span>
+          <span style="background: #0081a2">LM</span>
+        </span>
+      </div>
+      <p class="title">Checkout redesign</p>
+      <p class="sub">Which checkout feels faster?</p>
+      <div class="bar">
+        <span style="width: 38%; background: #277fff">38%</span>
+        <span style="width: 62%; background: #1baf7a">62%</span>
+      </div>
+    </div>
+    <span class="chip"><i>✓</i>Two steps is leading</span>
+
+    <script>
+      // The same field as the Overview's background: domain-warped value noise,
+      // ordered 8×8 Bayer dither, 3px dots in ink — densest top right, clear
+      // behind the words.
+      const c = document.getElementById('field')
+      const g = c.getContext('2d')
+      const W = c.width
+      const H = c.height
+      const img = g.createImageData(W, H)
+      // 8×8 Bayer threshold: interleave the bits of (x xor y) and y, lowest first.
+      const bayer = (x, y) => {
+        x &= 7
+        y &= 7
+        const z = x ^ y
+        let v = 0
+        for (let b = 0; b < 3; b++) v = (v << 2) | (((z >> b) & 1) << 1) | ((y >> b) & 1)
+        return (v + 0.5) / 64
+      }
+      const hash = (x, y) => {
+        let px = (x * 123.34) % 1
+        let py = (y * 456.21) % 1
+        if (px < 0) px += 1
+        if (py < 0) py += 1
+        const d = px * (px + 45.32) + py * (py + 45.32)
+        px += d
+        py += d
+        return (px * py) % 1
+      }
+      const noise = (x, y) => {
+        const ix = Math.floor(x)
+        const iy = Math.floor(y)
+        const fx = x - ix
+        const fy = y - iy
+        const ux = fx * fx * (3 - 2 * fx)
+        const uy = fy * fy * (3 - 2 * fy)
+        const a = hash(ix, iy)
+        const b = hash(ix + 1, iy)
+        const c2 = hash(ix, iy + 1)
+        const d = hash(ix + 1, iy + 1)
+        return a + (b - a) * ux + (c2 - a) * uy + (a - b - c2 + d) * ux * uy
+      }
+      const fbm = (x, y) => {
+        let v = 0
+        let a = 0.5
+        for (let i = 0; i < 5; i++) {
+          v += a * noise(x, y)
+          x = x * 2.03 + 1.7
+          y = y * 2.03 + 9.2
+          a *= 0.5
+        }
+        return v
+      }
+      const t = 1.8
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          const u = x / W
+          const v = 1 - y / H // y up
+          const px = u * (W / H) * 1.6
+          const py = v * 1.6
+          const qx = fbm(px, py + t)
+          const qy = fbm(px + 5.2, py - t)
+          const n = fbm(px + 2.2 * qx + t * 0.6, py + 2.2 * qy)
+          // Mostly on the right, fading out before the words.
+          const bias = Math.min(1, Math.max(0, (u * 1.2 + v * 0.3 - 0.66) / 0.5))
+          const s = bias * bias * (3 - 2 * bias)
+          const val = Math.min(1, Math.max(0, (n * 1.5 - 0.32) * s))
+          const on = val > bayer(x, y) ? 1 : 0
+          const i = (y * W + x) * 4
+          img.data[i] = 236
+          img.data[i + 1] = 236
+          img.data[i + 2] = 238
+          img.data[i + 3] = on * 56
+        }
+      }
+      g.putImageData(img, 0, 0)
+    </script>
+  </body>
+</html>
