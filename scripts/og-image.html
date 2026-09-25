@@ -58,7 +58,7 @@
         left: 80px;
         top: 0;
         bottom: 0;
-        width: 760px;
+        width: 960px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -86,134 +86,21 @@
         margin-top: 30px;
         font-family: 'Geist Pixel', monospace;
         font-weight: 500;
-        font-size: 84px;
+        font-size: 104px;
         line-height: 1;
         white-space: nowrap;
         letter-spacing: -0.01em;
       }
       .lede {
         margin-top: 24px;
-        max-width: 620px;
-        font-size: 30px;
+        max-width: 700px;
+        font-size: 32px;
         line-height: 1.35;
         color: var(--muted);
       }
       .lede strong {
         color: var(--ink);
         font-weight: 500;
-      }
-      .url {
-        position: absolute;
-        left: 80px;
-        bottom: 56px;
-        font-family: 'Geist Mono', monospace;
-        font-size: 22px;
-        color: var(--muted);
-      }
-
-      /* A slice of the kit, floating on the field. */
-      .card {
-        position: absolute;
-        right: 80px;
-        top: 124px;
-        width: 360px;
-        padding: 24px;
-        border-radius: 24px;
-        background: var(--card);
-        box-shadow:
-          0 0 0 1px rgb(255 255 255 / 0.07),
-          0 30px 70px -30px rgb(0 0 0 / 0.9);
-      }
-      .row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-      .badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 5px 12px;
-        border-radius: 999px;
-        background: #13291c;
-        color: #62d38e;
-        font-size: 16px;
-        font-weight: 500;
-      }
-      .badge i {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: currentColor;
-      }
-      .faces {
-        display: flex;
-      }
-      .faces span {
-        display: grid;
-        place-items: center;
-        width: 34px;
-        height: 34px;
-        margin-left: -5px;
-        border-radius: 50%;
-        box-shadow: 0 0 0 3px var(--card);
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-      }
-      .title {
-        margin-top: 18px;
-        font-size: 24px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-      }
-      .sub {
-        margin-top: 4px;
-        font-size: 17px;
-        color: var(--muted);
-      }
-      .bar {
-        display: flex;
-        gap: 3px;
-        margin-top: 20px;
-        height: 34px;
-        border-radius: 11px;
-        overflow: hidden;
-      }
-      .bar span {
-        display: grid;
-        place-items: center;
-        font-size: 15px;
-        font-weight: 600;
-        color: #18191d;
-      }
-      .chip {
-        position: absolute;
-        right: 132px;
-        top: 420px;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 18px 8px 8px;
-        border-radius: 999px;
-        background: var(--card);
-        box-shadow:
-          0 0 0 1px rgb(255 255 255 / 0.07),
-          0 20px 50px -24px rgb(0 0 0 / 0.9);
-        font-size: 17px;
-        font-weight: 500;
-      }
-      .chip i {
-        display: grid;
-        place-items: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: #1baf7a;
-        color: #fff;
-        font-style: normal;
-        font-size: 15px;
-        font-weight: 700;
       }
     </style>
   </head>
@@ -225,25 +112,7 @@
       <h1>Lightweight UI</h1>
       <p class="lede">A calm, fast React UI kit. <strong>100+ components</strong>, tokens and motion, in light and dark.</p>
     </div>
-    <p class="url">lightweight-ui-kit.vercel.app</p>
 
-    <div class="card">
-      <div class="row">
-        <span class="badge"><i></i>Active</span>
-        <span class="faces">
-          <span style="background: #4f46e5">AL</span>
-          <span style="background: #e11d48">SK</span>
-          <span style="background: #0081a2">LM</span>
-        </span>
-      </div>
-      <p class="title">Checkout redesign</p>
-      <p class="sub">Which checkout feels faster?</p>
-      <div class="bar">
-        <span style="width: 38%; background: #277fff">38%</span>
-        <span style="width: 62%; background: #1baf7a">62%</span>
-      </div>
-    </div>
-    <span class="chip"><i>✓</i>Two steps is leading</span>
 
     <script>
       // The same field as the Overview's background: domain-warped value noise,
@@ -316,7 +185,7 @@
           img.data[i] = 236
           img.data[i + 1] = 236
           img.data[i + 2] = 238
-          img.data[i + 3] = on * 56
+          img.data[i + 3] = on * 20
         }
       }
       g.putImageData(img, 0, 0)
