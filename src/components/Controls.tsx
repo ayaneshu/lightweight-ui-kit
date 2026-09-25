@@ -42,7 +42,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           onChange?.(e)
         }}
         className={cn(
-          'u-checkbox peer absolute inset-0 cursor-pointer rounded-[5px] border border-line-control bg-field',
+          'u-checkbox peer absolute inset-0 cursor-pointer rounded-[calc(5px*var(--lui-corner-fallback,1))] border border-line-control bg-field',
           'not-disabled:hover:border-ink not-disabled:hover:bg-ink/[0.03]',
           'checked:border-ink checked:bg-ink not-disabled:checked:hover:bg-ink indeterminate:border-ink indeterminate:bg-ink',
           'disabled:cursor-not-allowed disabled:opacity-40',
@@ -72,7 +72,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
  */
 const track = (checked: boolean) =>
   cn(
-    'flex h-5 w-9 flex-none items-center rounded-[7px] p-0.5 transition-colors duration-200',
+    'flex h-5 w-9 flex-none items-center rounded-[calc(7px*var(--lui-corner-fallback,1))] p-0.5 transition-colors duration-200',
     checked ? 'bg-ink group-hover:bg-ink/85' : 'bg-ink/[0.12] ring-1 ring-inset ring-line-control group-hover:bg-ink/[0.18]',
   )
 /**
@@ -82,7 +82,7 @@ const track = (checked: boolean) =>
  */
 const knob = (checked: boolean) =>
   cn(
-    'h-4 w-4 rounded-[5px] transition-[translate,scale,background-color] duration-200 ease-out group-active:scale-x-[1.25]',
+    'h-4 w-4 rounded-[calc(5px*var(--lui-corner-fallback,1))] transition-[translate,scale,background-color] duration-200 ease-out group-active:scale-x-[1.25]',
     checked ? 'translate-x-4 origin-right bg-on-ink rtl:-translate-x-4 rtl:origin-left' : 'origin-left bg-white shadow-hairline rtl:origin-right',
   )
 
@@ -105,7 +105,7 @@ export function Switch({ checked, onChange, disabled = false, label, className }
       aria-label={label}
       disabled={disabled}
       onClick={() => onChange(!checked)}
-      className={cn('group rounded-[9px] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40', className)}
+      className={cn('group rounded-[calc(9px*var(--lui-corner-fallback,1))] focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40', className)}
       data-static
     >
       <span className={track(checked)}>

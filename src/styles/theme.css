@@ -246,6 +246,42 @@
   }
 }
 
+/* Corner smoothing, and what to do without it.
+   The kit's radii are drawn with corner-shape: superellipse(4) (base.css), which
+   keeps a large radius looking nearly square — a 22px card corner reads like a
+   ~3px round one. Safari (so every browser on iOS) and Firefox don't support
+   corner-shape yet and would draw the full radius as a circle, so everything
+   looks far rounder there. In those browsers the radii shrink to their
+   plain-rounding equivalent: ×0.15, measured against Chrome's superellipse(4).
+   True circles (.u-circle) are untouched. If you set --lui-corner-shape: round,
+   also set --lui-corner-fallback: 1 so both kinds of browser match. */
+@supports not (corner-shape: round) {
+  :root {
+    --lui-corner-fallback: 0.15;
+    --radius: calc(0.25rem * var(--lui-corner-fallback));
+    --radius-xs: calc(0.125rem * var(--lui-corner-fallback));
+    --radius-sm: calc(0.25rem * var(--lui-corner-fallback));
+    --radius-md: calc(0.375rem * var(--lui-corner-fallback));
+    --radius-lg: calc(0.5rem * var(--lui-corner-fallback));
+    --radius-xl: calc(0.75rem * var(--lui-corner-fallback));
+    --radius-2xl: calc(1rem * var(--lui-corner-fallback));
+    --radius-3xl: calc(1.5rem * var(--lui-corner-fallback));
+    --radius-4xl: calc(2rem * var(--lui-corner-fallback));
+    --radius-chip: calc(10px * var(--lui-corner-fallback));
+    --radius-control: calc(14px * var(--lui-corner-fallback));
+    --radius-tile: calc(20px * var(--lui-corner-fallback));
+    --radius-panel: calc(22px * var(--lui-corner-fallback));
+    --radius-sheet: calc(26px * var(--lui-corner-fallback));
+    --radius-canvas: calc(28px * var(--lui-corner-fallback));
+    --radius-device: calc(38px * var(--lui-corner-fallback));
+  }
+  /* A "full" radius on a non-circle is a soft rectangle under superellipse(4),
+     not a stadium. */
+  .rounded-full:not(.u-circle) {
+    border-radius: calc(16px * var(--lui-corner-fallback));
+  }
+}
+
 @layer components {
   /* Opt out of corner smoothing for true circles — an avatar, a status dot.
      On a square with a full radius, superellipse renders a visible squircle. */

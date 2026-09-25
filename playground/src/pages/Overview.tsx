@@ -49,7 +49,7 @@ function Preview({ slug }: { slug: string }) {
       return (
         <div className="flex items-end gap-2">
           {[10, 16, 22, 28].map((r) => (
-            <span key={r} className="h-10 w-10 border-2 border-ink/80 bg-card shadow-card" style={{ borderRadius: r }} />
+            <span key={r} className="h-10 w-10 border-2 border-ink/80 bg-card shadow-card" style={{ borderRadius: `calc(${r}px * var(--lui-corner-fallback, 1))` }} />
           ))}
         </div>
       )

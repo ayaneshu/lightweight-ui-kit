@@ -20,7 +20,8 @@ export default function Shape() {
             <div key={r.token} className="rounded-2xl p-4 bg-ink/[0.03]">
               <div
                 className="mx-auto h-16 w-full border-2 border-ink/80 bg-ink/[0.03]"
-                style={{ borderRadius: r.px === 9999 ? 9999 : r.px }}
+                // The live token, so it follows the kit's fallback where corner-shape isn't supported.
+                style={{ borderRadius: r.px === 9999 ? 9999 : `var(--radius-${r.token})` }}
               />
               <p className="mt-3 font-mono text-caption font-medium">rounded-{r.token}</p>
               <p className="text-caption text-muted">{r.px === 9999 ? 'full' : `${r.px}px`}</p>

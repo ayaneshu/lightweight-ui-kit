@@ -226,7 +226,8 @@ export function HoverHighlight({
         aria-hidden="true"
         className="pointer-events-none absolute left-0 top-0"
         style={{
-          borderRadius: radius,
+          // Scales with the kit's radii where corner-shape isn't supported.
+          borderRadius: `calc(${radius}px * var(--lui-corner-fallback, 1))`,
           background: tone,
           width: box?.w ?? 0,
           height: box?.h ?? 0,
@@ -338,7 +339,7 @@ export function RailItem({
         aria-current={active ? 'page' : undefined}
         data-static
         className={cn(
-          'flex min-w-0 flex-1 items-center gap-2 rounded-[10px] text-start focus-visible:-outline-offset-2',
+          'flex min-w-0 flex-1 items-center gap-2 rounded-chip text-start focus-visible:-outline-offset-2',
           variant === 'flat' && 'px-2 py-1.5',
         )}
       >

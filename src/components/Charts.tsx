@@ -125,7 +125,7 @@ export function ShareLegend({
         const isLead = s.id === lead
         return (
           <li key={s.id} className="flex items-center gap-2.5 text-ui">
-            <span className="h-3 w-3 flex-none rounded-[4px]" style={{ background: s.color }} aria-hidden="true" />
+            <span className="h-3 w-3 flex-none rounded-[calc(4px*var(--lui-corner-fallback,1))]" style={{ background: s.color }} aria-hidden="true" />
             <span className={cn('min-w-0 flex-1 break-words', isLead ? 'font-semibold' : 'font-medium')}>{s.label}</span>
             {isLead && <span className="flex-none cursor-default select-none rounded-full bg-ink px-2 py-0.5 text-caption font-medium text-on-ink">Leading</span>}
             {s.id === mineId && <span className="flex-none cursor-default select-none rounded-full bg-ink/[0.06] px-2 py-0.5 text-caption text-muted">Your pick</span>}

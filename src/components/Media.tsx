@@ -45,7 +45,7 @@ export function DeviceFrame({ src, title = 'Prototype', width = 375, height = 81
     <div ref={boxRef} className={cn('w-full', className)}>
       <div
         className={cn('relative mx-auto', bordered && 'shadow-card ring-1 ring-ink/10')}
-        style={{ width: width * scale, height: height * scale, ...(bordered ? { borderRadius: 38 * scale } : null) }}
+        style={{ width: width * scale, height: height * scale, ...(bordered ? { borderRadius: `calc(${38 * scale}px * var(--lui-corner-fallback, 1))` } : null) }}
       >
         <iframe
           src={src}
