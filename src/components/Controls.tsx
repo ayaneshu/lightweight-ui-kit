@@ -42,7 +42,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           onChange?.(e)
         }}
         className={cn(
-          'u-checkbox peer absolute inset-0 cursor-pointer rounded-[calc(5px*var(--lui-corner-fallback,1))] border border-line-control bg-field',
+          'u-checkbox peer absolute inset-0 cursor-pointer rounded-[calc(5px*var(--lui-corner-fallback,1))] border border-line-field bg-field',
           'not-disabled:hover:border-ink not-disabled:hover:bg-ink/[0.03]',
           'checked:border-ink checked:bg-ink not-disabled:checked:hover:bg-ink indeterminate:border-ink indeterminate:bg-ink',
           'disabled:cursor-not-allowed disabled:opacity-40',
@@ -73,7 +73,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 const track = (checked: boolean) =>
   cn(
     'flex h-5 w-9 flex-none items-center rounded-[calc(7px*var(--lui-corner-fallback,1))] p-0.5 transition-colors duration-200',
-    checked ? 'bg-ink group-hover:bg-ink/85' : 'bg-ink/[0.12] ring-1 ring-inset ring-line-control group-hover:bg-ink/[0.18]',
+    checked ? 'bg-ink group-hover:bg-ink/85' : 'bg-ink/[0.12] ring-1 ring-inset ring-line-field group-hover:bg-ink/[0.18]',
   )
 /**
  * The knob: a square with softened corners. It slides with the reading
@@ -211,7 +211,7 @@ export function RadioGroup({ options, value, onChange, disabled = false, label, 
               aria-hidden="true"
               className={cn(
                 'u-circle grid h-4 w-4 flex-none place-items-center rounded-full border transition-[border-color,scale] duration-150 ease-out',
-                selected ? 'border-ink' : 'border-line-control group-hover:scale-110 group-hover:border-ink',
+                selected ? 'border-ink' : 'border-line-field group-hover:scale-110 group-hover:border-ink',
               )}
             >
               {selected && <span className="u-circle u-icon-in h-2 w-2 rounded-full bg-ink" />}

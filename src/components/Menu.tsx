@@ -1,4 +1,4 @@
-import { cloneElement, createContext, isValidElement, useCallback, useContext, useEffect, useRef } from 'react'
+import { cloneElement, createContext, isValidElement, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { CaretDown, Check } from '@phosphor-icons/react'
 import { cn } from '../lib/cn'
 import { useControllable, useDismiss, usePresence } from '../lib/hooks'
@@ -133,7 +133,7 @@ export function Popover({
     : trigger
 
   return (
-    <div ref={ref} className="relative inline-flex">
+    <div ref={ref} data-popover className="relative inline-flex">
       {triggerEl}
       {mounted && (
         <CloseContext.Provider value={close}>
@@ -261,24 +261,48 @@ export interface FilterOption {
   count?: number
 }
 
-export interface FilterMenuProps {
+interface FilterMenuBase {
   /** The axis — "Pod", "Status". Shown muted in the trigger. */
   label: string
-  value: string
-  onChange: (value: string) => void
   options: FilterOption[]
-  /** The resting value; anything else marks the trigger as active. */
-  defaultValue?: string
   align?: Align
   className?: string
 }
+
+export interface FilterMenuSingleProps extends FilterMenuBase {
+  multiple?: false
+  value: string
+  onChange: (value: string) => void
+  /** The resting value; anything else marks the trigger as active. */
+  defaultValue?: string
+}
+
+export interface FilterMenuMultipleProps extends FilterMenuBase {
+  /** Pick any number of options. The menu stays open while you pick. */
+  multiple: true
+  /** The picked values, in the order of `options`. Empty means no filter. */
+  value: string[]
+  onChange: (value: string[]) => void
+  /** What the trigger says while nothing is picked. */
+  allLabel?: string
+}
+
+export type FilterMenuProps = FilterMenuSingleProps | FilterMenuMultipleProps
 
 /**
  * One filter axis as a menu. The trigger states what's selected rather than
  * just naming the axis ("Pod · Growth"), so a filtered list explains itself —
  * to sight and to a screen reader — without opening anything.
+ *
+ * Single: a listbox; picking an option applies it and closes. Multiple:
+ * checkbox rows that apply as you tick them and keep the menu open, with Clear
+ * and Done underneath. The trigger names the first pick and counts the rest.
  */
-export function FilterMenu({ label, value, onChange, options, defaultValue = 'all', align = 'start', className }: FilterMenuProps) {
+export function FilterMenu(props: FilterMenuProps) {
+  return props.multiple ? <MultiFilterMenu {...props} /> : <SingleFilterMenu {...props} />
+}
+
+function SingleFilterMenu({ label, value, onChange, options, defaultValue = 'all', align = 'start', className }: FilterMenuSingleProps) {
   const selected = options.find((o) => o.value === value) ?? options[0]
   const active = value !== defaultValue
   return (
@@ -316,13 +340,175 @@ export function FilterMenu({ label, value, onChange, options, defaultValue = 'al
                 {isSelected && <Check size={13} weight="bold" className="u-icon-in" />}
               </span>
               <span className={cn('min-w-0 flex-1 truncate', isSelected ? 'font-semibold' : 'font-medium')}>{o.label}</span>
-              {o.count !== undefined && <span className="flex-none text-caption tabular-nums text-muted">{o.count}</span>}
+              <Count value={o.count} />
             </button>
           )
         })
       }
     </Popover>
   )
+}
+
+function MultiFilterMenu({ label, value, onChange, options, allLabel = 'All', align = 'start', className }: FilterMenuMultipleProps) {
+  const picked = options.filter((o) => value.includes(o.value))
+  const more = picked.length - 1
+  return (
+    <Popover
+      role="dialog"
+      surface="menu"
+      label={`Filter by ${label}`}
+      align={align}
+      className={cn('min-w-[240px]', className)}
+      trigger={
+        <FilterTrigger label={label} active={picked.length > 0}>
+          {picked.length === 0 ? (
+            allLabel
+          ) : (
+            <>
+              {picked[0].label}
+              {more > 0 && (
+                <>
+                  {/* Keyed on the count, so each change pops in rather than just swapping digits. */}
+                  <span
+                    key={more}
+                    aria-hidden="true"
+                    className="u-icon-in ms-1.5 inline-grid h-[18px] min-w-[18px] place-items-center rounded-full bg-ink/[0.07] px-1.5 text-caption font-semibold tabular-nums"
+                  >
+                    +{more}
+                  </span>
+                  <span className="sr-only"> and {more} more</span>
+                </>
+              )}
+            </>
+          )}
+        </FilterTrigger>
+      }
+    >
+      <MultiFilterList label={label} value={value} onChange={onChange} options={options} />
+    </Popover>
+  )
+}
+
+/**
+ * The panel's contents. A multi-select listbox with a roving tab stop — arrows,
+ * Home and End move, Space or Enter ticks — then Clear and Done. Tab walks from
+ * the list to the buttons; leaving the panel closes it.
+ */
+function MultiFilterList({ label, value, onChange, options }: Pick<FilterMenuMultipleProps, 'label' | 'value' | 'onChange' | 'options'>) {
+  const close = usePopoverClose()
+  const listRef = useRef<HTMLDivElement>(null)
+  const [cursor, setCursor] = useState(() => Math.max(options.findIndex((o) => value.includes(o.value)), 0))
+  // The last option ticked by hand — only it plays the pop, never the ones already on.
+  const [touched, setTouched] = useState<string | null>(null)
+
+  const rows = () => Array.from(listRef.current?.querySelectorAll<HTMLElement>('[role="option"]') ?? [])
+
+  // Focus lands on the first ticked option, or the first one.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => rows()[cursor]?.focus())
+    return () => cancelAnimationFrame(frame)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function toggle(v: string) {
+    const next = new Set(value)
+    if (next.has(v)) next.delete(v)
+    else next.add(v)
+    setTouched(v)
+    onChange(options.filter((o) => next.has(o.value)).map((o) => o.value))
+  }
+
+  function onListKey(e: React.KeyboardEvent) {
+    const all = rows()
+    const at = all.indexOf(document.activeElement as HTMLElement)
+    const go = (i: number) => {
+      e.preventDefault()
+      all[(i + all.length) % all.length]?.focus()
+    }
+    if (e.key === 'ArrowDown') go(at + 1)
+    else if (e.key === 'ArrowUp') go(at - 1)
+    else if (e.key === 'Home') go(0)
+    else if (e.key === 'End') go(all.length - 1)
+  }
+
+  return (
+    <div
+      onBlur={(e) => {
+        // Tabbing out closes it. Focus moving to the trigger doesn't — its own
+        // click toggles the panel — and neither does a click on the panel's
+        // padding (no related target). Clicks outside are the Popover's.
+        const to = e.relatedTarget as Node | null
+        if (to && !e.currentTarget.closest('[data-popover]')?.contains(to)) close('tab')
+      }}
+    >
+      <div
+        ref={listRef}
+        role="listbox"
+        aria-label={label}
+        aria-multiselectable="true"
+        onKeyDown={onListKey}
+        className="max-h-[280px] overflow-y-auto"
+      >
+        {options.map((o, i) => {
+          const isSelected = value.includes(o.value)
+          return (
+            <button
+              key={o.value}
+              type="button"
+              role="option"
+              tabIndex={i === cursor ? 0 : -1}
+              aria-selected={isSelected}
+              data-static
+              onFocus={() => setCursor(i)}
+              onClick={() => toggle(o.value)}
+              className={cn(ROW, 'hover:bg-ink/[0.04]', o.count === 0 && !isSelected ? 'text-muted' : 'text-ink')}
+            >
+              <span
+                aria-hidden="true"
+                data-checked={isSelected || undefined}
+                data-touched={touched === o.value || undefined}
+                className={cn(
+                  'u-checkmark grid h-4 w-4 flex-none place-items-center rounded-[calc(4px*var(--lui-corner-fallback,1))] border',
+                  isSelected ? 'border-ink bg-ink' : 'border-line-field bg-field group-hover/row:border-ink',
+                )}
+              >
+                <svg viewBox="0 0 12 12" className="u-check h-2.5 w-2.5 text-on-ink">
+                  <path className="u-check-tick" pathLength={1} d="M2.6 6.4 5 8.7 9.6 3.6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <span className="min-w-0 flex-1 truncate">{o.label}</span>
+              <Count value={o.count} />
+            </button>
+          )
+        })}
+      </div>
+      <div className="-mx-1 -mb-1 mt-1 flex items-center justify-between gap-2 border-t border-line p-1">
+        <button
+          type="button"
+          disabled={value.length === 0}
+          onClick={() => {
+            onChange([])
+            rows()[0]?.focus()
+          }}
+          className="u-press rounded-chip px-2.5 py-1.5 text-label font-medium text-muted hover:bg-ink/[0.04] hover:text-ink focus-visible:-outline-offset-2 disabled:pointer-events-none disabled:opacity-40"
+        >
+          Clear
+        </button>
+        <button
+          type="button"
+          onClick={() => close('select')}
+          className="u-press rounded-chip px-2.5 py-1.5 text-label font-semibold text-ink hover:bg-ink/[0.04] focus-visible:-outline-offset-2"
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function Count({ value }: { value?: number }) {
+  if (value === undefined) return null
+  return <span className="flex-none text-caption tabular-nums text-muted">{value}</span>
 }
 
 function FilterTrigger({

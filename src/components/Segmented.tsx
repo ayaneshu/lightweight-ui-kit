@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '../lib/cn'
-import { CountBadge } from './Badge'
 
 export interface SegmentItem<T extends string> {
   value: T
@@ -118,7 +117,7 @@ function Segment<T extends string>({
       {/* Icon-only still has a name: visually hidden text, which works for
           any label — not just a string. */}
       {iconOnly ? <span className="sr-only">{item.label}</span> : item.label}
-      {item.count !== undefined && <CountBadge active={active}>{item.count}</CountBadge>}
+      {item.count !== undefined && <SegCount active={active}>{item.count}</SegCount>}
     </>
   )
   const title = iconOnly && typeof item.label === 'string' ? item.label : undefined
@@ -143,6 +142,25 @@ function Segment<T extends string>({
     <button {...shared} type="button" aria-pressed={active} disabled={item.disabled} onClick={() => onChange?.(item.value)}>
       {content}
     </button>
+  )
+}
+
+/**
+ * A count inside a segment. It docks into the segment's end: 20px tall in a
+ * 28px chip, so 4px clear above and below — and `pad` gives it the same 4px
+ * after it. 8px before it keeps it apart from the label. Its corners are the
+ * chip's, less that inset.
+ */
+function SegCount({ active, children }: { active: boolean; children: React.ReactNode }) {
+  return (
+    <span
+      className={cn(
+        'ms-0.5 grid h-5 min-w-5 flex-none select-none place-items-center rounded-[calc(6px*var(--lui-corner-fallback,1))] px-1.5 text-micro font-semibold tabular-nums transition-colors',
+        active ? 'bg-current/10' : 'bg-ink/[0.05] text-muted',
+      )}
+    >
+      {children}
+    </span>
   )
 }
 
@@ -174,6 +192,22 @@ function Group({
 const SEG =
   'relative z-10 transition-colors duration-[var(--lui-duration-slide)] ease-out focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-40'
 
+/*
+ * One family. Every group below sits on the same track — a hairline edge
+ * around the lightest wash — and every raised selector is the same small card,
+ * edged by a faint ring rather than a border, so the chosen segment reads as
+ * lifted without a heavy outline. Same corners (the chip is concentric
+ * with the track: 14px outside, 4px padding and a 1px edge, 10px inside), same
+ * 28px segments, same resting and hover colours.
+ */
+const TRACK = 'relative rounded-control border border-line bg-track p-1'
+const THUMB = 'rounded-chip bg-raised shadow-thumb'
+const CHIP = 'h-7 items-center gap-1.5 rounded-chip text-label font-medium'
+/** Inline padding: 14px each side, or 4px at the end when a count docks there. */
+const pad = (item: { count?: number }) => (item.count === undefined ? 'px-3.5' : 'ps-3.5 pe-1')
+const IDLE = 'text-muted not-disabled:hover:bg-ink/[0.03] not-disabled:hover:text-ink'
+const look = (active: boolean) => (active ? 'text-ink' : IDLE)
+
 /* ---------------------------------------------------- SegmentedControl */
 
 /**
@@ -190,12 +224,12 @@ export function SegmentedControl<T extends string>({ items, value, onChange, lab
   const ref = useRef<HTMLDivElement>(null)
   const { box, ready } = useIndicator(ref, value)
   const layout = 'inline-flex flex-wrap items-center gap-1 p-1'
-  const segCls = 'flex h-7 items-center gap-1.5 rounded-chip px-3.5 text-label font-medium'
+  const segCls = (item: SegmentItem<T>) => cn('flex', pad(item), CHIP)
   // A plain rectangle: the text never reaches the corners, and the pill below draws them.
   const clip = box ? `inset(${box.y}px ${box.W - box.x - box.w}px ${box.H - box.y - box.h}px ${box.x}px)` : 'inset(50%)'
   const slide = ready && 'duration-[var(--lui-duration-slide)]'
   return (
-    <Group items={items} label={label} groupRef={ref} className={cn('relative rounded-control border border-line', layout, className)}>
+    <Group items={items} label={label} groupRef={ref} className={cn(TRACK, layout, className)}>
       <Indicator box={box} ready={ready} className="rounded-chip bg-ink" />
       {items.map((item) => (
         <Segment
@@ -205,7 +239,7 @@ export function SegmentedControl<T extends string>({ items, value, onChange, lab
           onChange={onChange}
           // No press scale here: the light copy above can't scale with it.
           still
-          className={cn(segCls, SEG, 'text-muted', item.value !== value && 'not-disabled:hover:bg-ink/[0.04] not-disabled:hover:text-ink')}
+          className={cn(segCls(item), SEG, look(item.value === value))}
         />
       ))}
       <div
@@ -217,10 +251,10 @@ export function SegmentedControl<T extends string>({ items, value, onChange, lab
         {items.map((item) => (
           // Each copy carries its own ink pill with the kit's corners, so what the
           // clip reveals is a whole pill — and its text always sits on ink.
-          <span key={item.value} className={cn(segCls, 'bg-ink text-on-ink')}>
+          <span key={item.value} className={cn(segCls(item), 'bg-ink text-on-ink')}>
             {item.icon}
             {item.label}
-            {item.count !== undefined && <CountBadge active>{item.count}</CountBadge>}
+            {item.count !== undefined && <SegCount active>{item.count}</SegCount>}
           </span>
         ))}
       </div>
@@ -231,9 +265,8 @@ export function SegmentedControl<T extends string>({ items, value, onChange, lab
 /* ---------------------------------------------------------- PillTabs */
 
 /**
- * View tabs on a wash track — the chosen one lifts to a raised card that
- * slides between them. The Editor · Preview · Results switch: three views of
- * one thing, one bar.
+ * View tabs — the chosen one lifts to a raised card that slides between them.
+ * The Editor · Preview · Results switch: three views of one thing, one bar.
  */
 export function PillTabs<T extends string>({ items, value, onChange, label, className }: GroupProps<T>) {
   const ref = useRef<HTMLDivElement>(null)
@@ -243,20 +276,16 @@ export function PillTabs<T extends string>({ items, value, onChange, label, clas
       items={items}
       label={label}
       groupRef={ref}
-      className={cn('relative inline-flex items-center gap-1 rounded-control border border-line bg-ink/[0.03] p-1', className)}
+      className={cn(TRACK, 'inline-flex items-center gap-1', className)}
     >
-      <Indicator box={box} ready={ready} className="rounded-chip bg-raised shadow-hairline" />
+      <Indicator box={box} ready={ready} className={THUMB} />
       {items.map((item) => (
         <Segment
           key={item.value}
           item={item}
           active={item.value === value}
           onChange={onChange}
-          className={cn(
-            'u-press flex h-7 items-center gap-1.5 rounded-chip px-3.5 text-label font-medium',
-            SEG,
-            item.value === value ? 'text-ink' : 'text-muted not-disabled:hover:bg-ink/[0.03] not-disabled:hover:text-ink',
-          )}
+          className={cn('u-press flex', pad(item), CHIP, SEG, look(item.value === value))}
         />
       ))}
     </Group>
@@ -285,10 +314,10 @@ export function SlidingSwitch<T extends string>({
       items={items}
       label={label}
       groupRef={ref}
-      className={cn('relative inline-grid rounded-control border border-line bg-ink/[0.03] p-1', className)}
+      className={cn(TRACK, 'inline-grid gap-1', className)}
       style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
     >
-      <Indicator box={box} ready={ready} className="rounded-chip bg-raised shadow-hairline" />
+      <Indicator box={box} ready={ready} className={THUMB} />
       {items.map((item) => (
         <Segment
           key={item.value}
@@ -296,12 +325,7 @@ export function SlidingSwitch<T extends string>({
           active={item.value === value}
           onChange={onChange}
           iconOnly={iconOnly}
-          className={cn(
-            'flex h-7 items-center justify-center gap-1.5 rounded-chip text-label font-medium',
-            SEG,
-            iconOnly ? 'w-10' : 'px-3.5',
-            item.value === value ? 'text-ink' : 'text-muted not-disabled:hover:text-ink',
-          )}
+          className={cn('u-press flex justify-center', CHIP, SEG, iconOnly ? 'w-9' : pad(item), look(item.value === value))}
         />
       ))}
     </Group>
@@ -311,8 +335,8 @@ export function SlidingSwitch<T extends string>({
 /* -------------------------------------------------------- FilterPills */
 
 /**
- * Filter pills with counts, on a rounded-full wash — one axis, every option
- * worth seeing at once (All · Draft · Active · Closed).
+ * Filter pills with counts — one axis, every option worth seeing at once
+ * (All · Draft · Active · Closed). Wraps onto more rows when it runs out of room.
  */
 export function FilterPills<T extends string>({ items, value, onChange, label, className }: GroupProps<T>) {
   const ref = useRef<HTMLDivElement>(null)
@@ -322,20 +346,16 @@ export function FilterPills<T extends string>({ items, value, onChange, label, c
       items={items}
       label={label}
       groupRef={ref}
-      className={cn('relative inline-flex flex-wrap items-center gap-1 rounded-full bg-ink/[0.04] p-1', className)}
+      className={cn(TRACK, 'inline-flex flex-wrap items-center gap-1', className)}
     >
-      <Indicator box={box} ready={ready} className="rounded-full bg-raised shadow-pill" />
+      <Indicator box={box} ready={ready} className={THUMB} />
       {items.map((item) => (
         <Segment
           key={item.value}
           item={item}
           active={item.value === value}
           onChange={onChange}
-          className={cn(
-            'u-press inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-label font-medium',
-            SEG,
-            item.value === value ? 'text-ink' : 'text-muted not-disabled:hover:bg-ink/[0.04] not-disabled:hover:text-ink',
-          )}
+          className={cn('u-press inline-flex', pad(item), CHIP, SEG, look(item.value === value))}
         />
       ))}
     </Group>
@@ -344,13 +364,13 @@ export function FilterPills<T extends string>({ items, value, onChange, label, c
 
 /* ---------------------------------------------------- IconToggleGroup */
 
-/** Icon-only toggle on a pill track — list / grid. */
+/** Icon-only toggle — list / grid. */
 export function IconToggleGroup<T extends string>({ items, value, onChange, label, className }: GroupProps<T>) {
   const ref = useRef<HTMLDivElement>(null)
   const { box, ready } = useIndicator(ref, value)
   return (
-    <Group items={items} label={label} groupRef={ref} className={cn('relative inline-flex items-center gap-1 rounded-full bg-ink/[0.04] p-1', className)}>
-      <Indicator box={box} ready={ready} className="rounded-full bg-raised shadow-pill" />
+    <Group items={items} label={label} groupRef={ref} className={cn(TRACK, 'inline-flex items-center gap-1', className)}>
+      <Indicator box={box} ready={ready} className={THUMB} />
       {items.map((item) => (
         <Segment
           key={item.value}
@@ -358,7 +378,7 @@ export function IconToggleGroup<T extends string>({ items, value, onChange, labe
           active={item.value === value}
           onChange={onChange}
           iconOnly
-          className={cn('u-press grid h-7 w-8 place-items-center rounded-full', SEG, item.value === value ? 'text-ink' : 'text-muted not-disabled:hover:text-ink')}
+          className={cn('u-press grid w-9 place-items-center', CHIP, SEG, look(item.value === value))}
         />
       ))}
     </Group>

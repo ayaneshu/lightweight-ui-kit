@@ -78,6 +78,7 @@
   --color-line: light-dark(#ededec, #2a2b30); /* card edges, dividers */
   --color-line-strong: light-dark(#e3e3e0, #34353b); /* outlined buttons, dashed wells */
   --color-line-control: light-dark(#949494, #6c6e78); /* edges that identify a control — 3:1 */
+  --color-line-field: light-dark(#c4c4c2, #4c4e56); /* a field or box at rest; hover and focus bring it up */
 
   /* Constant darks for things drawn on media, which don't follow the theme. */
   --color-shade: #18191d;
@@ -107,6 +108,9 @@
   --color-wash-4: color-mix(in oklab, var(--color-ink) 6%, transparent); /* selected rows, pills */
   --color-wash-5: color-mix(in oklab, var(--color-ink) 8%, transparent); /* soft hover, chips */
   --color-wash-6: color-mix(in oklab, var(--color-ink) 12%, transparent); /* switch track (off) */
+  /* Segmented tracks: the faintest wash in light, so the border does the
+     framing; a step more in dark, where a 1.5% lift disappears. */
+  --color-track: light-dark(var(--color-wash-1), var(--color-wash-2));
 
   /* Charts — option identity (categorical) and ordered ramp (ratings). Same in
      both themes: every fill clears 3:1 against the dark card too. */
@@ -148,6 +152,7 @@
      below so each can switch with the theme. */
   --shadow-hairline: var(--lui-shadow-hairline);
   --shadow-pill: var(--lui-shadow-pill);
+  --shadow-thumb: var(--lui-shadow-thumb);
   --shadow-card: var(--lui-shadow-card);
   --shadow-menu: var(--lui-shadow-menu);
   --shadow-modal: var(--lui-shadow-modal);
@@ -193,6 +198,12 @@
   --lui-shadow-hairline: 0 1px 2px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.5));
   --lui-shadow-pill: 0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.5)),
     0 1px 1px light-dark(rgb(0 0 0 / 0.04), rgb(0 0 0 / 0.3));
+  /* The chosen segment: a small raised card. Its edge is a faint ring — lighter
+     than any border — with a soft drop in light; in dark, a top highlight does
+     the lifting, since shadows barely read there. */
+  --lui-shadow-thumb: 0 0 0 1px light-dark(rgb(0 0 0 / 0.04), rgb(255 255 255 / 0.04)),
+    0 1px 2px light-dark(rgb(0 0 0 / 0.06), rgb(0 0 0 / 0.35)),
+    inset 0 1px 0 light-dark(transparent, rgb(255 255 255 / 0.04));
   --lui-shadow-card: 0 0 0 1px light-dark(transparent, rgb(255 255 255 / 0.04)),
     0 1px 2px light-dark(rgb(0 0 0 / 0.03), rgb(0 0 0 / 0.4)),
     0 16px 44px -24px light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.7));
@@ -458,10 +469,22 @@
     transition: stroke-dashoffset 90ms var(--ease-out);
   }
   .u-checkbox:checked:not(:indeterminate) + .u-check .u-check-tick,
-  .u-checkbox:indeterminate + .u-check .u-check-dash {
+  .u-checkbox:indeterminate + .u-check .u-check-dash,
+  .u-checkmark[data-checked] .u-check-tick {
     stroke-dashoffset: 0;
     transition-duration: 260ms;
     transition-delay: 50ms;
+  }
+
+  /* The same box drawn inside a row that is itself the control (a
+     multi-select option), so it follows data-checked instead of :checked. */
+  .u-checkmark {
+    transition-property: background-color, border-color;
+    transition-duration: 160ms;
+    transition-timing-function: var(--ease-out);
+  }
+  .u-checkmark[data-checked][data-touched] {
+    animation: u-check-pop 340ms var(--ease-out);
   }
 
   /* Range — a 4px track filled in ink up to the value (--lui-range, set by
@@ -504,7 +527,7 @@
     border-radius: 999px;
     background: #fff;
     box-shadow:
-      0 0 0 1px var(--color-line-control),
+      0 0 0 1px var(--color-line-field),
       0 1px 3px rgb(0 0 0 / 0.25);
     transition:
       scale 160ms var(--ease-out),
@@ -517,7 +540,7 @@
     border-radius: 999px;
     background: #fff;
     box-shadow:
-      0 0 0 1px var(--color-line-control),
+      0 0 0 1px var(--color-line-field),
       0 1px 3px rgb(0 0 0 / 0.25);
     transition:
       scale 160ms var(--ease-out),
@@ -747,7 +770,8 @@
   }
   .u-flash,
   .u-wiggle,
-  .u-checkbox {
+  .u-checkbox,
+  .u-checkmark {
     animation: none !important;
   }
   .u-loader-dots > * {

@@ -7,6 +7,8 @@ export default function Menus() {
   const toast = useToast()
   const [pod, setPod] = useState('all')
   const [status, setStatus] = useState('all')
+  const [pods, setPods] = useState<string[]>(['Growth', 'Storefront'])
+  const [types, setTypes] = useState<string[]>([])
 
   return (
     <>
@@ -61,8 +63,10 @@ export default function Menus() {
         </Demo>
       </Section>
 
-      <Section id="filter-menu" title="FilterMenu" description="A menu that filters a list by one property, such as status. The trigger shows the current choice, not just the property name, so people can see how the list is filtered without opening the menu. The tick has its own column, so labels don't shift when it appears. Options with no matches stay selectable but look muted.">
+      <Section id="filter-menu" title="FilterMenu" description="A menu that filters a list by one property, such as status. The trigger shows the current choice, not just the property name, so people can see how the list is filtered without opening the menu. It comes in two kinds: pick one, or pick several. Options with no matches stay selectable but look muted.">
         <Demo
+          title="Pick one"
+          description="Choosing an option applies it and closes the menu. The tick has its own column, so labels don't shift when it appears."
           className="min-h-[340px] items-start pt-10"
           code={`<FilterMenu
   label="Pod"
@@ -96,6 +100,53 @@ export default function Menus() {
               { value: 'all', label: 'All', count: 24 },
               { value: 'open', label: 'Active', count: 16 },
               { value: 'closed', label: 'Closed', count: 8 },
+            ]}
+          />
+        </Demo>
+        <Demo
+          title="Pick several"
+          description="Add `multiple` and each option gets a checkbox. Ticking one applies it straight away and keeps the menu open, so you can pick a few in a row. Clear and Done sit underneath. The trigger names the first pick and counts the rest, as in `Growth +1`. With nothing picked, it shows `allLabel`."
+          className="min-h-[420px] items-start pt-10"
+          code={`const [pods, setPods] = useState<string[]>([])
+
+<FilterMenu
+  multiple
+  label="Pod"
+  allLabel="All pods"
+  value={pods}
+  onChange={setPods}
+  options={[
+    { value: 'Customer', label: 'Customer', count: 5 },
+    { value: 'Growth', label: 'Growth', count: 9 },
+    …
+  ]}
+/>`}
+        >
+          <FilterMenu
+            multiple
+            label="Pod"
+            allLabel="All pods"
+            value={pods}
+            onChange={setPods}
+            options={[
+              { value: 'Customer', label: 'Customer', count: 5 },
+              { value: 'Growth', label: 'Growth', count: 9 },
+              { value: 'Loyalty', label: 'Loyalty', count: 0 },
+              { value: 'Storefront', label: 'Storefront', count: 8 },
+              { value: '', label: 'No pod', count: 2 },
+            ]}
+          />
+          <FilterMenu
+            multiple
+            label="Type"
+            value={types}
+            onChange={setTypes}
+            options={[
+              { value: 'survey', label: 'Survey', count: 11 },
+              { value: 'quiz', label: 'Quiz', count: 4 },
+              { value: 'poll', label: 'Poll', count: 3 },
+              { value: 'feedback', label: 'Feedback', count: 5 },
+              { value: 'signup', label: 'Sign-up', count: 1 },
             ]}
           />
         </Demo>
@@ -162,9 +213,11 @@ export default function Menus() {
           title="FilterMenu"
           rows={[
             { name: 'label', type: 'string', description: 'The property you filter by, such as "Status". Shown muted in the trigger.' },
-            { name: 'value / onChange', type: 'string / (v) => void', description: '' },
+            { name: 'multiple', type: 'boolean', default: 'false', description: 'Pick several options instead of one. The menu stays open while you pick, and value becomes an array.' },
+            { name: 'value / onChange', type: 'string / (v) => void', description: 'With `multiple`: `string[]` / `(v: string[]) => void`, in the order of `options`. An empty array means no filter.' },
             { name: 'options', type: '{ value, label, count? }[]', description: '' },
-            { name: 'defaultValue', type: 'string', default: "'all'", description: 'The unfiltered value. Any other value marks the trigger as active.' },
+            { name: 'defaultValue', type: 'string', default: "'all'", description: 'Pick one only. The unfiltered value. Any other value marks the trigger as active.' },
+            { name: 'allLabel', type: 'string', default: "'All'", description: 'Pick several only. What the trigger says while nothing is picked.' },
           ]}
         />
       </Section>

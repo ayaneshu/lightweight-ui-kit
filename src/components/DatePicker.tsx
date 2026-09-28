@@ -178,7 +178,7 @@ export function DatePicker({ value, onChange, min, max, invalid = false, placeho
         className={cn(
           // A field, so it focuses like one: the edge turns ink, no outer ring.
           'flex w-full items-center justify-between gap-2 rounded-xl border bg-field px-3.5 py-2.5 text-start text-base outline-hidden transition-colors duration-150 sm:text-ui',
-          bad ? 'border-danger' : open ? 'border-ink' : 'border-line-control hover:border-ink/60 focus-visible:border-ink',
+          bad ? 'border-danger' : open ? 'border-ink' : 'border-line-field hover:border-ink/60 focus-visible:border-ink',
         )}
       >
         <span className={selected ? '' : 'text-muted'}>

@@ -343,7 +343,11 @@ function Sidebar({
       {!compact && (
         <div className="flex h-14 flex-none items-center justify-between px-4">
           <Logo name="Lightweight UI" href="#/overview" />
-          <Badge size="sm">v0.1</Badge>
+          <a href="#/changelog" aria-label={`Version ${__LUI_VERSION__}. See the changelog`} className="rounded-full focus-visible:outline-offset-2">
+            <Badge size="sm" className="cursor-pointer transition-colors hover:bg-ink/[0.1] hover:text-ink">
+              v{__LUI_VERSION__}
+            </Badge>
+          </a>
         </div>
       )}
       <div className={cn('flex-none px-3 pb-2', compact && 'pt-3')}>

@@ -23,7 +23,7 @@ export default function Inputs() {
       <PageHeader
         eyebrow="Components"
         title="Inputs"
-        description="Text fields and selects share one look: 12px corners and a border with at least 3:1 contrast. Focus shows on the field itself, not as a ring around it: the border turns ink. Inline editors have no border, so their background darkens instead. Invalid fields turn red. The label goes above the field and the hint below. An error replaces the hint rather than adding a second line."
+        description="Text fields and selects share one look: 12px corners and a quiet border at rest, so a long form doesn’t turn into a grid of boxes. Hover darkens the border. Focus shows on the field itself, not as a ring around it: the border turns ink. Inline editors have no border, so their background darkens instead. Invalid fields turn red. The label goes above the field and the hint below. An error replaces the hint rather than adding a second line."
       />
 
       <Section id="playground" title="Input">

@@ -1,0 +1,24 @@
+# On every pull request into main: if it changes the kit (src/ or bin/), the
+# version must go up, CHANGELOG.md must have notes for it, and the bump must be
+# big enough for those notes. Playground-only changes pass without a bump.
+name: Version
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the version and changelog
+        run: node scripts/changelog.mjs check "origin/${{ github.base_ref }}"
