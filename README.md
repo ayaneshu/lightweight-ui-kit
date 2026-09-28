@@ -128,7 +128,7 @@ The tokens are available as CSS variables (`var(--color-ink)`), as Tailwind util
 | Display | `Badge`, `StatusBadge`, `CountBadge`, `Dot`, `LetterBadge`, `IconTile`, `UpvoteChip`, `Avatar`, `AvatarStack`, `Tooltip`, `Heading`, `Text`, `Overline`, `Eyebrow`, `Divider` |
 | Forms | `Field`, `FieldError`, `FieldRow`, `Input`, `Textarea`, `Select`, `SearchInput`, `InlineInput`, `InlineTextarea`, `CopyField`, `Checkbox`, `Switch`, `Toggle`, `RadioGroup`, `Slider`, `ValueBox`, `Rating`, `Swatch`, `CustomColorSwatch`, `ChoiceTile`, `DatePicker` |
 | Navigation | `SegmentedControl`, `PillTabs`, `SlidingSwitch`, `FilterPills`, `IconToggleGroup`, `UnderlineNav`, `AppHeader`, `Toolbar`, `Logo`, `Breadcrumb`, `HoverHighlight`, `RailItem`, `RailGroup`, `RailAction`, `AddRow`, `PropertyPanel`, `PropertyGroup`, `ResizeHandle` |
-| Menus | `Popover`, `Menu`, `MenuItem`, `MenuDivider`, `MenuLabel`, `FilterMenu` |
+| Menus | `Popover`, `Menu`, `MenuItem`, `MenuDivider`, `MenuLabel`, `FilterMenu` (pick one, or several with `multiple`) |
 | Overlays | `Dialog`, `DialogHeader`, `DialogBody`, `DialogFooter`, `ConfirmDialog`, `Lightbox`, `CommandMenu` (⌘K), `Kbd` |
 | Feedback | `Toast`, `ToastProvider`, `useToast`, `Callout`, `EmptyState`, `Skeleton`, `Spinner`, `Placeholder`, `SuccessMark`, `Nudge` |
 | Loading | `Loader` (pixel, dots, spinner, bar), `LoaderOverlay` (for a card or panel that's refreshing), `PageLoader` (a top bar for page changes), `useLoading` (waits 150ms before showing, then stays at least 400ms, so fast loads never flash) |
@@ -156,9 +156,33 @@ src/
     index.css      build entry for the precompiled styles.css
     fonts/         Geist, Geist Pixel Square, Geist Mono (OFL)
 bin/lightweight-ui.mjs   the copy-in CLI
-scripts/           CSS build
+scripts/           CSS build, link-preview card, versions and changelog
 playground/        Vite app: docs, live demos, patterns
+CHANGELOG.md       every release, newest first
 ```
+
+## Versions and changelog
+
+Every release is listed in [CHANGELOG.md](CHANGELOG.md) and on the playground's [Changelog page](https://lightweight-ui-kit.vercel.app/#/changelog). Each version is tagged on GitHub, so you can install exactly the one you want:
+
+```bash
+npm install github:ayaneshu/lightweight-ui-kit#v0.2.0
+```
+
+Version numbers follow [Semantic Versioning](https://semver.org), and the size of a bump depends on what changed rather than how much:
+
+| Bump | When | Example |
+| --- | --- | --- |
+| Patch | A fix or a visual refinement. No API change. | 0.2.0 → 0.2.1 |
+| Minor | Something new: a component, a prop, a variant or a token. | 0.2.0 → 0.3.0 |
+| Major | A breaking change: something removed, renamed or behaving differently. Until 1.0.0, this bumps the minor instead. | 1.0.0 → 2.0.0 |
+
+**Cutting a release.** A pull request that changes the kit (`src/` or `bin/`) needs a new version:
+
+1. Write what changed under `## [Unreleased]` in CHANGELOG.md, grouped as Added, Changed, Deprecated, Removed or Fixed. Start a note with `**Breaking**` if existing code has to change.
+2. Run `npm run release`. It reads the headings to pick the bump (Added or Deprecated make a minor, Removed or **Breaking** a major, anything else a patch), moves the notes under the new version, updates `package.json` and `package-lock.json`, and redraws the link-preview card when the minor or major changes. To force a bump, use `npm run release -- minor` or an exact version; it refuses anything smaller than the notes need.
+3. Commit and open the pull request. The **Version** check fails if kit files changed without a bump, or if the bump is too small for the notes. Playground-only changes pass without one.
+4. When it merges into `main`, the **Release** workflow tags `vX.Y.Z` and publishes a GitHub release with that version's notes.
 
 ## Notes
 

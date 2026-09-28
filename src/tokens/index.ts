@@ -21,6 +21,7 @@ export const themes = {
     line: '#ededec',
     lineStrong: '#e3e3e0',
     lineControl: '#949494',
+    lineField: '#c4c4c2',
     draft: '#96660b',
     draftBg: '#fbf3e3',
     open: '#15803d',
@@ -44,6 +45,7 @@ export const themes = {
     line: '#2a2b30',
     lineStrong: '#34353b',
     lineControl: '#6c6e78',
+    lineField: '#4c4e56',
     draft: '#e4b660',
     draftBg: '#2c2413',
     open: '#62d38e',
@@ -82,8 +84,8 @@ export const dangerColors = {
 
 /** Ink at low alpha — black on light, white on dark. Hover, pressed, tracks and empty surfaces. */
 export const washes = [
-  { token: 'wash-1', alpha: 0.015, use: 'Empty & placeholder surfaces' },
-  { token: 'wash-2', alpha: 0.03, use: 'Hover on outlined controls, tab tracks' },
+  { token: 'wash-1', alpha: 0.015, use: 'Empty & placeholder surfaces, segmented tracks (light)' },
+  { token: 'wash-2', alpha: 0.03, use: 'Hover on outlined controls, segmented tracks (dark)' },
   { token: 'wash-3', alpha: 0.04, use: 'Hover on ghost controls, search field' },
   { token: 'wash-4', alpha: 0.06, use: 'Selected rows, neutral pills, icon tiles' },
   { token: 'wash-5', alpha: 0.08, use: 'Soft-button hover, overflow chips' },
@@ -149,8 +151,9 @@ export const radii = [
 ] as const
 
 export const shadows = [
-  { token: 'hairline', value: '0 1px 2px rgba(0,0,0,0.08)', use: 'Active segment in a tab track' },
-  { token: 'pill', value: '0 1px 2px rgba(0,0,0,0.06), 0 1px 1px rgba(0,0,0,0.04)', use: 'Active filter pill' },
+  { token: 'hairline', value: '0 1px 2px rgba(0,0,0,0.08)', use: 'Switch knob, active filter menu' },
+  { token: 'thumb', value: '0 0 0 1px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)', use: 'The chosen segment on a track' },
+  { token: 'pill', value: '0 1px 2px rgba(0,0,0,0.06), 0 1px 1px rgba(0,0,0,0.04)', use: 'Raised rail item' },
   { token: 'card', value: '0 1px 2px rgba(0,0,0,0.03), 0 16px 44px -24px rgba(0,0,0,0.18)', use: 'Resting raised card, account popover' },
   { token: 'menu', value: '0 4px 12px -2px rgba(0,0,0,0.08), 0 16px 40px -12px rgba(0,0,0,0.22)', use: 'Menus, date picker, listbox' },
   { token: 'modal', value: '0 1px 2px rgba(0,0,0,0.03), 0 24px 60px -24px rgba(0,0,0,0.35)', use: 'Dialogs' },

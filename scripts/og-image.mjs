@@ -17,11 +17,15 @@ const fonts = join(root, 'src/styles/fonts')
 const out = join(root, 'playground/public/og.png')
 const chrome = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 
+// The card shows major.minor, so patch releases don't need a new one.
+const [major, minor] = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version.split('.')
+
 const dataUrl = (file) => `data:font/woff2;base64,${readFileSync(join(fonts, file)).toString('base64')}`
 const html = readFileSync(join(root, 'scripts/og-image.html'), 'utf8')
   .replace('__GEIST__', dataUrl('Geist-Variable.woff2'))
   .replace('__PIXEL__', dataUrl('GeistPixel-Square.woff2'))
   .replace('__MONO__', dataUrl('GeistMono-Variable.woff2'))
+  .replace('__VERSION__', `v${major}.${minor}`)
 
 const dir = mkdtempSync(join(tmpdir(), 'lui-og-'))
 const page = join(dir, 'og.html')

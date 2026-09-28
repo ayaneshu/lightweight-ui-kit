@@ -17,10 +17,10 @@ export default function SegmentedPage() {
       <PageHeader
         eyebrow="Components"
         title="Tabs & segmented"
-        description="Six controls for switching between a few options, each for a different job. They share one motion: a single highlight slides to the option you pick, instead of each option fading in its own background. The slide uses a CSS transform and takes 240ms with a strong ease-out. With reduced motion on, it jumps straight into place. If two controls share a bar, give them the same height (h-7 inside a p-1 track) so the bar lines up."
+        description="Six controls for switching between a few options, each for a different job. The five on a track look alike: a bordered track on a faint wash, 28px options, and the chosen one raised on a small card. All six share one motion: a single highlight slides to the option you pick, instead of each option fading in its own background. The slide uses a CSS transform and takes 240ms with a strong ease-out. With reduced motion on, it jumps straight into place. If two controls share a bar, give them the same height (h-7 inside a p-1 track) so the bar lines up."
       />
 
-      <Section id="pill-tabs" title="PillTabs" description="Use for switching between views of the same thing, like Editor, Preview and Results. The selected tab is a raised card that slides along a tinted track. Give each item an href to make it a real link, so every view has its own URL and the Back button works.">
+      <Section id="pill-tabs" title="PillTabs" description="Use for switching between views of the same thing, like Editor, Preview and Results. The selected tab is a raised card that slides along the track. Give each item an href to make it a real link, so every view has its own URL and the Back button works.">
         <Demo
           code={`<PillTabs
   label="Form views"
@@ -79,7 +79,7 @@ export default function SegmentedPage() {
         </Demo>
       </Section>
 
-      <Section id="segmented" title="SegmentedControl" description="Use for a setting with a few options, where only one can be on and all should stay visible. The selected option fills with ink. A light copy of the labels sits on top, trimmed to the highlight, so as it slides the text turns light exactly where the highlight covers it.">
+      <Section id="segmented" title="SegmentedControl" description="Use for a setting with a few options, where only one can be on and all should stay visible. It sits on the same track as the others, but the selected option fills with ink, for a setting that should stand out. A light copy of the labels sits on top, trimmed to the highlight, so as it slides the text turns light exactly where the highlight covers it.">
         <Demo code={`<SegmentedControl value={n} onChange={setN} items={[{ value: '5', label: '5 min' }, …]} />`}>
           <SegmentedControl
             label="Estimated time"

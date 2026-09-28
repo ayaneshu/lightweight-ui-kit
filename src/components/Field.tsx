@@ -92,10 +92,11 @@ export function FieldRow({ label, children, className }: { label: React.ReactNod
 /* ---------------------------------------------------------------- Inputs */
 
 /**
- * The one field treatment: 12px radius and a control edge that clears 3:1.
- * Focus is the border itself turning ink — no ring floating outside the field
- * (the edge goes from 3:1 to over 6:1 against the surface, so it's plain to
- * see). Hover darkens the edge halfway; invalid is danger throughout. 16px
+ * The one field treatment: 12px radius and a quiet edge at rest, so a form full
+ * of fields doesn't read as a grid of boxes. Hover darkens the edge halfway;
+ * focus is the border itself turning ink — no ring floating outside the field,
+ * and over 6:1 against the surface, so it's plain to see. Invalid is danger
+ * throughout. 16px
  * text on phones so iOS doesn't zoom the page on focus, 14px from `sm` up.
  */
 export function fieldClasses({ invalid = false, size = 'md' }: { invalid?: boolean; size?: 'sm' | 'md' | 'lg' } = {}) {
@@ -104,7 +105,7 @@ export function fieldClasses({ invalid = false, size = 'md' }: { invalid?: boole
     size === 'sm' && 'h-8 px-3',
     size === 'md' && 'px-3.5 py-2.5',
     size === 'lg' && 'h-11 px-3.5',
-    invalid ? 'border-danger focus:bg-danger-bg/40' : 'border-line-control not-disabled:hover:border-ink/60 focus:border-ink not-disabled:focus:hover:border-ink',
+    invalid ? 'border-danger focus:bg-danger-bg/40' : 'border-line-field not-disabled:hover:border-ink/60 focus:border-ink not-disabled:focus:hover:border-ink',
   )
 }
 

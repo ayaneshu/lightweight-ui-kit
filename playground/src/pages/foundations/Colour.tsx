@@ -16,7 +16,8 @@ const CORE: { key: Key; token: string; name: string; use: string }[] = [
   { key: 'field', token: 'field', name: 'Field', use: 'Input fields' },
   { key: 'line', token: 'line', name: 'Line', use: 'Card edges and dividers' },
   { key: 'lineStrong', token: 'line-strong', name: 'Line strong', use: 'Outlined buttons and dashed empty areas' },
-  { key: 'lineControl', token: 'line-control', name: 'Line control', use: 'Edges that mark out a control, like field borders and empty stars. At least 3:1 contrast.' },
+  { key: 'lineControl', token: 'line-control', name: 'Line control', use: 'Edges that must stand out, like empty stars, and field borders on hover. At least 3:1 contrast.' },
+  { key: 'lineField', token: 'line-field', name: 'Line field', use: 'Field, checkbox and radio borders at rest. Hover and focus darken them.' },
 ]
 
 const STATUS: { status: 'draft' | 'open' | 'closed'; fg: Key; bg: Key }[] = [
@@ -67,7 +68,7 @@ export default function Colour() {
         <CodeBlock title="Theming" code={THEMING} />
       </Section>
 
-      <Section id="core" title="Core tokens" description="These ten tokens cover almost everything. Use each one as a Tailwind colour (bg-ink, text-muted, border-line-control) or as a CSS variable (var(--color-ink)). Click a value to copy it.">
+      <Section id="core" title="Core tokens" description="These eleven tokens cover almost everything. Use each one as a Tailwind colour (bg-ink, text-muted, border-line-control) or as a CSS variable (var(--color-ink)). Click a value to copy it.">
         <ScrollTable label="Core colour tokens">
           <Table className="min-w-[560px]">
             <THead>
