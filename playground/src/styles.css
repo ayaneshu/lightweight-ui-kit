@@ -92,12 +92,28 @@ html {
   }
 }
 
-/* A theme change spreads out from where it was asked for, as a circle (App.tsx
-   drives the clip). Only the root snapshot takes part: the page and the nav
-   pill drop their own names for the moment, so the whole window turns at once. */
+/* A theme change crossfades the whole window as one image. The page and the
+   nav pill drop their own names for the moment, so they don't fade on their
+   own schedule; old and new are blended so the midpoint doesn't dip or flash. */
 .pg-theme-vt .pg-page,
 .pg-theme-vt .pg-nav-pill {
   view-transition-name: none;
+}
+html.pg-theme-vt::view-transition-old(root) {
+  animation: pg-theme-out 250ms ease both;
+}
+html.pg-theme-vt::view-transition-new(root) {
+  animation: pg-theme-in 250ms ease both;
+}
+@keyframes pg-theme-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes pg-theme-in {
+  from {
+    opacity: 0;
+  }
 }
 
 /* The phone nav drawer slides in from the edge it lives on, on the iOS drawer

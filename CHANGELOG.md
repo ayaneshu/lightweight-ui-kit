@@ -10,6 +10,10 @@ Write notes under Unreleased as you work. `npm run release` turns them into the 
 
 ## [Unreleased]
 
+### Changed
+
+- In the playground, changing the theme now crossfades the whole window over 250ms instead of spreading out as a circle. Nothing sweeps across the screen, so no corner lags behind the rest, and the crossfade still plays with reduced motion on.
+
 ## [0.2.1] - 2026-10-08
 
 ### Changed
