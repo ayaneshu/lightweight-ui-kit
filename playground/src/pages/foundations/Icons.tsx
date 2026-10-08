@@ -1,9 +1,9 @@
-import { useDeferredValue, useEffect, useMemo, useState } from 'react'
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { icons } from '@phosphor-icons/core'
 import * as Phosphor from 'lightweight-ui/icons'
 import { ArrowSquareOut, Bell, X, type Icon, type IconWeight } from 'lightweight-ui/icons'
-import { cn, commandScore, IconButton, SearchInput, SegmentedControl, Select } from 'lightweight-ui'
+import { cn, commandScore, IconButton, SearchInput, SegmentedControl, Select, usePresence } from 'lightweight-ui'
 import { CodeBlock, CopyButton, PageHeader, Section } from '../../ui/Demo'
 
 /** Phosphor's metadata, typed loosely — its literal types are too big for the checker. */
@@ -60,6 +60,12 @@ export default function Icons() {
   }, [deferred, category])
 
   const current = selected ? ALL.find((i) => i.pascal_name === selected) : undefined
+  // The panel stays put while you move between icons — only its contents
+  // change — and keeps showing the last one while it slides away.
+  const { mounted: detailMounted, closing: detailClosing } = usePresence(Boolean(current), 120)
+  const lastShown = useRef(current)
+  if (current) lastShown.current = current
+  const detail = current ?? lastShown.current
 
   return (
     <>
@@ -204,13 +210,25 @@ export default function Icons() {
         )}
       </Section>
 
-      {current && <IconDetail key={current.pascal_name} icon={current} weight={weight} onWeight={setWeight} onClose={() => setSelected(null)} />}
+      {detailMounted && detail && <IconDetail icon={detail} closing={detailClosing} weight={weight} onWeight={setWeight} onClose={() => setSelected(null)} />}
     </>
   )
 }
 
 /** The chosen icon, docked to the bottom of the window: every weight, and the code. */
-function IconDetail({ icon, weight, onWeight, onClose }: { icon: Meta; weight: IconWeight; onWeight: (w: IconWeight) => void; onClose: () => void }) {
+function IconDetail({
+  icon,
+  closing,
+  weight,
+  onWeight,
+  onClose,
+}: {
+  icon: Meta
+  closing: boolean
+  weight: IconWeight
+  onWeight: (w: IconWeight) => void
+  onClose: () => void
+}) {
   const Glyph = GLYPHS[icon.pascal_name]
   const imp = `import { ${icon.pascal_name} } from 'lightweight-ui/icons'`
   const jsx = `<${icon.pascal_name} size={16}${weight === 'regular' ? '' : ` weight="${weight}"`} aria-hidden="true" />`
@@ -224,15 +242,17 @@ function IconDetail({ icon, weight, onWeight, onClose }: { icon: Meta; weight: I
   return createPortal(
     <section
       aria-label={`${icon.pascal_name} icon`}
+      data-closing={closing || undefined}
       className="u-toast fixed inset-x-3 bottom-3 z-40 mx-auto max-w-[860px] rounded-sheet bg-card p-4 shadow-modal lg:start-[284px]"
     >
       <div className="flex flex-col gap-4 sm:flex-row">
         <div className="grid h-28 w-full flex-none place-items-center rounded-2xl bg-ink/[0.02] sm:w-28">
-          <Glyph size={56} weight={weight} aria-hidden="true" className="u-icon-in" />
+          {/* Keyed, so each new icon scales in where the last one was. */}
+          <Glyph key={icon.pascal_name} size={56} weight={weight} aria-hidden="true" className="u-icon-in" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
+            <div key={icon.pascal_name} className="u-swap min-w-0">
               <h3 className="font-sans text-title font-semibold tracking-tight">{icon.pascal_name}</h3>
               <p className="mt-0.5 truncate text-label capitalize text-muted">{[...icon.categories, ...icon.tags.filter((t) => !t.startsWith('*')).slice(0, 5)].join(' · ')}</p>
             </div>

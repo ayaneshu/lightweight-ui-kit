@@ -460,6 +460,7 @@ function DitherBackground() {
 function InstallLine() {
   const cmd = `npm install github:${REPO}`
   const [copied, setCopied] = useState(false)
+  const [touched, setTouched] = useState(false)
   return (
     <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-xl bg-ink/[0.04] py-1 ps-3.5 pe-1">
       <span className="select-none font-mono text-[13px] text-muted" aria-hidden="true">
@@ -472,6 +473,7 @@ function InstallLine() {
           try {
             await navigator.clipboard.writeText(cmd)
             setCopied(true)
+            setTouched(true)
             setTimeout(() => setCopied(false), 1400)
           } catch {
             /* clipboard blocked — the text is there to select */
@@ -480,7 +482,7 @@ function InstallLine() {
         aria-label={copied ? 'Copied' : 'Copy install command'}
         className="u-press grid h-7 w-7 flex-none place-items-center rounded-lg text-muted hover:bg-ink/[0.06] hover:text-ink focus-visible:outline-offset-2"
       >
-        {copied ? <Check size={14} weight="bold" aria-hidden="true" className="u-icon-in" /> : <Copy size={14} aria-hidden="true" />}
+        {copied ? <Check size={14} weight="bold" aria-hidden="true" className="u-icon-in" /> : <Copy size={14} aria-hidden="true" className={touched ? 'u-icon-in' : undefined} />}
       </button>
       <span role="status" className="sr-only">
         {copied ? 'Install command copied' : ''}

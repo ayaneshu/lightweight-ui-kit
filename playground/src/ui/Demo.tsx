@@ -99,6 +99,8 @@ export interface DemoProps {
  */
 export function Demo({ title, description, code, controls, stage = 'dots', className, codeOpen = false, children }: DemoProps) {
   const [showCode, setShowCode] = useState(codeOpen)
+  // The code mounts the first time it's asked for, then stays, so it can close as smoothly as it opened.
+  const [codeMounted, setCodeMounted] = useState(codeOpen)
   return (
     <div>
       {(title || description) && (
@@ -136,7 +138,10 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
             <div className="flex items-center justify-between border-t border-line px-3 py-2">
               <button
                 type="button"
-                onClick={() => setShowCode((s) => !s)}
+                onClick={() => {
+                  setCodeMounted(true)
+                  setShowCode((s) => !s)
+                }}
                 aria-expanded={showCode}
                 className="u-press inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-label font-medium text-muted hover:bg-ink/[0.05] hover:text-ink focus-visible:outline-offset-2"
               >
@@ -145,11 +150,15 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
               </button>
               <CopyButton text={code} />
             </div>
-            {showCode && (
-              <div className="u-swap border-t border-line bg-ink/[0.02]">
-                <CodeView code={code} />
+            <div inert={!showCode} data-collapsed={!showCode || undefined} className="pg-collapse">
+              <div className="min-h-0 overflow-hidden">
+                {codeMounted && (
+                  <div className="border-t border-line bg-ink/[0.02]">
+                    <CodeView code={code} />
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>
@@ -161,6 +170,8 @@ export function Demo({ title, description, code, controls, stage = 'dots', class
 
 export function CopyButton({ text, label = 'Copy' }: { text: string; label?: string }) {
   const [copied, setCopied] = useState(false)
+  // After the first copy, the copy glyph scales back in too — but never on page load.
+  const [touched, setTouched] = useState(false)
   return (
     <button
       type="button"
@@ -168,6 +179,7 @@ export function CopyButton({ text, label = 'Copy' }: { text: string; label?: str
         try {
           await navigator.clipboard.writeText(text)
           setCopied(true)
+          setTouched(true)
           setTimeout(() => setCopied(false), 1400)
         } catch {
           /* clipboard blocked */
@@ -175,7 +187,7 @@ export function CopyButton({ text, label = 'Copy' }: { text: string; label?: str
       }}
       className="u-press inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-label font-medium text-muted hover:bg-ink/[0.05] hover:text-ink focus-visible:outline-offset-2"
     >
-      {copied ? <Check size={13} weight="bold" aria-hidden="true" className="u-icon-in" /> : <Copy size={13} aria-hidden="true" />}
+      {copied ? <Check size={13} weight="bold" aria-hidden="true" className="u-icon-in" /> : <Copy size={13} aria-hidden="true" className={cn(touched && 'u-icon-in')} />}
       {copied ? 'Copied' : label}
     </button>
   )

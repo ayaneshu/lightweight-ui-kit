@@ -8,13 +8,19 @@ import { REPO } from '../ui/site'
  * The changelog page reads CHANGELOG.md itself, so it can't drift from what's
  * released. Only what the file uses is understood: "## [x.y.z] - date"
  * headings, "### Kind" subheadings, "- " items that may wrap onto indented
- * lines, and inline `code`, **bold** and links.
+ * lines, one level of indented "- " sub-items, and inline `code`, **bold**
+ * and links.
  */
+
+interface Item {
+  text: string
+  children: string[]
+}
 
 interface Release {
   version: string
   date?: string
-  groups: { kind: string; items: string[] }[]
+  groups: { kind: string; items: Item[] }[]
 }
 
 function parse(md: string): Release[] {
@@ -25,10 +31,13 @@ function parse(md: string): Release[] {
     if (head) releases.push({ version: head[1], date: head[2], groups: [] })
     else if (!release) continue
     else if (line.startsWith('### ')) release.groups.push({ kind: line.slice(4).trim(), items: [] })
-    else if (line.startsWith('- ')) release.groups.at(-1)?.items.push(line.slice(2).trim())
+    else if (line.startsWith('- ')) release.groups.at(-1)?.items.push({ text: line.slice(2).trim(), children: [] })
     else if (/^\s+\S/.test(line)) {
-      const items = release.groups.at(-1)?.items
-      if (items?.length) items[items.length - 1] += ` ${line.trim()}`
+      const item = release.groups.at(-1)?.items.at(-1)
+      if (!item) continue
+      if (/^\s+- /.test(line)) item.children.push(line.trim().slice(2))
+      else if (item.children.length) item.children[item.children.length - 1] += ` ${line.trim()}`
+      else item.text += ` ${line.trim()}`
     }
   }
   return releases.filter((r) => r.groups.some((g) => g.items.length))
@@ -225,8 +234,17 @@ function Entry({ release: r, index, first, last }: { release: Release; index: nu
               </h3>
               <ul className="mt-3 list-disc space-y-2.5 ps-5 text-ui leading-relaxed text-pretty text-muted marker:text-line-control">
                 {g.items.map((item) => (
-                  <li key={item} className="ps-1">
-                    <Inline text={item} />
+                  <li key={item.text} className="ps-1">
+                    <Inline text={item.text} />
+                    {item.children.length > 0 && (
+                      <ul className="mt-2 list-[circle] space-y-1.5 ps-5">
+                        {item.children.map((child) => (
+                          <li key={child} className="ps-1">
+                            <Inline text={child} />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>

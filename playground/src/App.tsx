@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { ArrowLeft, ArrowRight, CaretDown, Copy, Desktop, GithubLogo, List, MagnifyingGlass, Moon, Sun, X, type Icon } from 'lightweight-ui/icons'
 import {
@@ -90,7 +90,7 @@ function useRoute() {
         else if (changing) window.scrollTo({ top: 0, behavior: 'instant' })
       }
       last.current = next.slug
-      if (changing && canTransition && !reduceMotion()) document.startViewTransition(apply)
+      if (changing && canTransition && !reduceMotion()) quiet(document.startViewTransition(apply))
       else apply()
     }
     window.addEventListener('hashchange', on)
@@ -99,6 +99,58 @@ function useRoute() {
     return () => window.removeEventListener('hashchange', on)
   }, [])
   return { ...route, loading }
+}
+
+/** A transition can be skipped (a hidden tab, a newer one starting); that's fine, not an error. */
+function quiet(vt: ViewTransition) {
+  vt.ready.catch(() => {})
+  vt.finished.catch(() => {})
+  return vt
+}
+
+/* ------------------------------------------------------------ Theme reveal */
+
+/** Where the pointer last went down — a theme change spreads out from there. */
+let lastPointer: { x: number; y: number; at: number } | null = null
+if (typeof window !== 'undefined') {
+  window.addEventListener('pointerdown', (e) => (lastPointer = { x: e.clientX, y: e.clientY, at: e.timeStamp }), { capture: true, passive: true })
+}
+
+/**
+ * Switch theme inside a view transition, revealing the new one as a circle
+ * that grows from the switch you pressed (or the focused control, for the
+ * keyboard and ⌘K). It's rare and it's the whole window, so it can take a
+ * little longer than a control would — 400ms, all ease-out, so most of the
+ * change lands in the first 150. When nothing visible changes (Light → System
+ * on a light OS), or motion is reduced, it just switches.
+ */
+function useThemeReveal(): [Theme, (t: Theme) => void] {
+  const [theme, setNow, resolved] = useTheme()
+  const set = useCallback(
+    (next: Theme) => {
+      const to = next === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : next
+      if (to === resolved || !canTransition || reduceMotion()) return setNow(next)
+      const recent = lastPointer && performance.now() - lastPointer.at < 1000
+      const focus = document.activeElement !== document.body ? document.activeElement?.getBoundingClientRect() : undefined
+      const x = recent ? lastPointer!.x : focus ? focus.left + focus.width / 2 : window.innerWidth / 2
+      const y = recent ? lastPointer!.y : focus ? focus.top + focus.height / 2 : 0
+      const r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
+      const root = document.documentElement
+      root.classList.add('pg-theme-vt')
+      const vt = quiet(document.startViewTransition(() => flushSync(() => setNow(next))))
+      vt.ready
+        .then(() =>
+          root.animate(
+            { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
+            { duration: 400, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', pseudoElement: '::view-transition-new(root)' },
+          ),
+        )
+        .catch(() => {})
+      vt.finished.finally(() => root.classList.remove('pg-theme-vt')).catch(() => {})
+    },
+    [resolved, setNow],
+  )
+  return [theme, set]
 }
 
 function go(href: string) {
@@ -115,9 +167,9 @@ function go(href: string) {
 export default function App() {
   const { slug, loading } = useRoute()
   const [drawer, setDrawer] = useState(false)
-  const { mounted: drawerMounted, closing: drawerClosing } = usePresence(drawer)
+  const { mounted: drawerMounted, closing: drawerClosing } = usePresence(drawer, 200)
   // One theme state for the whole app, so every switch shows the same choice.
-  const [theme, setTheme] = useTheme()
+  const [theme, setTheme] = useThemeReveal()
   const [searching, setSearching] = useState(false)
   const current = PAGES.find((p) => p.slug === slug) ?? PAGES[0]
   const index = PAGES.indexOf(current)
@@ -161,7 +213,11 @@ export default function App() {
             <MagnifyingGlass size={18} />
           </IconButton>
           <IconButton label={drawer ? 'Close navigation' : 'Open navigation'} aria-expanded={drawer} onClick={() => setDrawer((d) => !d)}>
-            {drawer ? <X size={18} /> : <List size={18} />}
+            {/* The two glyphs trade places: one turns away and blurs out as the other turns in. */}
+            <span className="relative grid size-[18px] place-items-center" aria-hidden="true">
+              <List size={18} className={cn(MORPH, drawer && 'rotate-90 scale-50 opacity-0 blur-[2px]')} />
+              <X size={18} className={cn(MORPH, !drawer && '-rotate-90 scale-50 opacity-0 blur-[2px]')} />
+            </span>
           </IconButton>
         </div>
       </header>
@@ -173,7 +229,7 @@ export default function App() {
         >
           <aside
             data-closing={drawerClosing || undefined}
-            className="u-popover flex h-full w-[284px] max-w-[85vw] origin-top-left flex-col bg-bg shadow-modal rtl:origin-top-right"
+            className="pg-drawer flex h-full w-[284px] max-w-[85vw] flex-col bg-bg shadow-modal"
             onMouseDown={(e) => e.stopPropagation()}
           >
             <Sidebar slug={slug} compact theme={theme} onTheme={setTheme} onSearch={openSearch} />
@@ -210,6 +266,8 @@ export default function App() {
     </div>
   )
 }
+
+const MORPH = 'absolute transition-[opacity,scale,rotate,filter] duration-200 ease-out'
 
 /* ------------------------------------------------------------------ Search */
 
@@ -435,24 +493,27 @@ function SidebarGroup({
       ) : (
         <p className="sr-only">{group}</p>
       )}
-      {open && (
-        <div id={id} className="mt-1">
-          {sections.map((section) => (
-            <div key={section ?? 'all'} className={cn(section && 'mt-2.5 first:mt-0')}>
-              {section && <p className="px-2.5 pb-1 pt-0.5 text-caption font-medium text-muted">{section}</p>}
-              <ul className={cn(section && 'ps-3')}>
-                {pages
-                  .filter((p) => p.section === section)
-                  .map((p) => (
-                    <li key={p.slug}>
-                      <NavLink page={p} active={p.slug === slug} withIcon={!section} />
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          ))}
+      {/* Opens and closes to its height rather than snapping; inert while shut, so its links leave the tab order. */}
+      <div id={id} inert={!open} data-collapsed={!open || undefined} className="pg-collapse">
+        <div className="min-h-0 overflow-hidden">
+          <div className="pt-1">
+            {sections.map((section) => (
+              <div key={section ?? 'all'} className={cn(section && 'mt-2.5 first:mt-0')}>
+                {section && <p className="px-2.5 pb-1 pt-0.5 text-caption font-medium text-muted">{section}</p>}
+                <ul className={cn(section && 'ps-3')}>
+                  {pages
+                    .filter((p) => p.section === section)
+                    .map((p) => (
+                      <li key={p.slug}>
+                        <NavLink page={p} active={p.slug === slug} withIcon={!section} />
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -530,6 +591,17 @@ function PagerLink({ page, dir }: { page: PageDef; dir: 'prev' | 'next' }) {
 function OnThisPage({ slug }: { slug: string }) {
   const [sections, setSections] = useState<{ id: string; title: string }[]>([])
   const [active, setActive] = useState<string | null>(null)
+  const listRef = useRef<HTMLUListElement>(null)
+  // One tick that travels to the current section, like the kit's tab highlights.
+  // It's placed without a transition the first time, so it doesn't slide in from the top.
+  const [tick, setTick] = useState<{ y: number; moved: boolean } | null>(null)
+
+  useLayoutEffect(() => {
+    const link = active ? listRef.current?.querySelector<HTMLElement>(`[data-id="${CSS.escape(active)}"]`) : null
+    if (!link) return setTick(null)
+    const y = link.offsetTop + link.offsetHeight / 2
+    setTick((t) => ({ y, moved: t !== null }))
+  }, [active, sections])
 
   useEffect(() => {
     // Drop the last page's sections at once, then poll briefly until this
@@ -570,11 +642,19 @@ function OnThisPage({ slug }: { slug: string }) {
     <nav aria-label="On this page" className="hidden w-[180px] flex-none xl:block">
       <div className="sticky top-14">
         <p className="mb-2 text-micro font-semibold uppercase tracking-[0.06em] text-muted">On this page</p>
-        <ul className="space-y-0.5">
+        <ul ref={listRef} className="relative space-y-0.5">
+          {tick && (
+            <span
+              aria-hidden="true"
+              className={cn('absolute start-0 top-0 h-3.5 w-0.5 rounded-full bg-ink', tick.moved && 'transition-transform duration-200 ease-out')}
+              style={{ transform: `translateY(${tick.y - 7}px)` }}
+            />
+          )}
           {sections.map((s) => (
             <li key={s.id}>
               <a
                 href={`#/${slug}#${s.id}`}
+                data-id={s.id}
                 onClick={(e) => {
                   e.preventDefault()
                   // Smooth unless reduced motion is on — the html rule decides.
@@ -582,8 +662,8 @@ function OnThisPage({ slug }: { slug: string }) {
                 }}
                 className={cn(
                   // The current section gets a short ink tick, not a rail running the whole list.
-                  'relative block rounded-md py-1 ps-3 text-label transition-colors before:absolute before:start-0 before:top-1/2 before:h-3.5 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:transition-colors',
-                  active === s.id ? 'font-medium text-ink before:bg-ink' : 'text-muted before:bg-transparent hover:text-ink',
+                  'block rounded-md py-1 ps-3 text-label transition-colors',
+                  active === s.id ? 'font-medium text-ink' : 'text-muted hover:text-ink',
                 )}
               >
                 {s.title}

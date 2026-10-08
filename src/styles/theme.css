@@ -364,6 +364,27 @@
   .u-toast[data-closing] {
     transform: translateY(6px);
   }
+  /* The ⌘K palette: it hangs from the top of the window, so it settles down
+     into place from its top edge — quicker and shallower than a dialog. */
+  .u-palette {
+    transform-origin: top center;
+    transition:
+      opacity var(--lui-duration-popover) var(--ease-out),
+      transform var(--lui-duration-popover) var(--ease-out);
+  }
+  @starting-style {
+    .u-palette {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.97);
+    }
+  }
+  .u-palette[data-closing] {
+    opacity: 0;
+    transform: scale(0.98);
+    transition-duration: 100ms;
+    pointer-events: none;
+  }
+
   /* Once one tooltip is open, the next opens instantly — no delay, no fade. */
   .u-popover[data-instant] {
     transition-duration: 0ms;
