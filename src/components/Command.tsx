@@ -2,7 +2,7 @@ import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from 'r
 import { createPortal } from 'react-dom'
 import { ArrowElbowDownLeft, ArrowDown, ArrowUp, MagnifyingGlass } from '@phosphor-icons/react'
 import { cn } from '../lib/cn'
-import { useDismiss, useFocusTrap } from '../lib/hooks'
+import { useDismiss, useFocusTrap, usePresence } from '../lib/hooks'
 
 /* -------------------------------------------------------------------- Kbd */
 
@@ -165,9 +165,11 @@ interface Group {
 /**
  * Search anything, from anywhere — the ⌘K palette.
  *
- * It opens instantly, with no entrance animation: it's summoned from the
- * keyboard, many times a day, and anything between the keypress and typing
- * is in the way. Results are ranked (exact, prefix, word-start, substring,
+ * It settles in from just above where it lands — 150ms, from 0.97 and a few
+ * pixels up, over a fading scrim — and leaves faster than it came. Focus is
+ * in the field from the first frame, so the motion never stands between the
+ * keypress and typing; and nothing moves while you type or arrow through
+ * results, which happens far more often than opening. Results are ranked (exact, prefix, word-start, substring,
  * letters in order), grouped, and capped per group so a long tail can't bury
  * the pages. Arrow keys move, Enter picks, Escape clears the query and then
  * closes. It follows the APG combobox pattern: focus stays in the field, and
@@ -193,6 +195,7 @@ export function CommandMenu({
   const byKeyboard = useRef(false)
   const uid = useId()
   const close = () => onOpenChange(false)
+  const { mounted, closing } = usePresence(open, 120)
 
   useFocusTrap(panelRef, open, inputRef)
   useDismiss(open, panelRef, (reason) => reason === 'escape' && close(), { outside: false })
@@ -263,17 +266,22 @@ export function CommandMenu({
     }
   }
 
-  if (!open || typeof document === 'undefined') return null
+  if (!mounted || typeof document === 'undefined') return null
 
   let index = -1
   return createPortal(
-    <div className="fixed inset-0 z-[90] flex items-start justify-center overscroll-contain bg-scrim px-4 pt-[12vh] backdrop-blur-sm" onMouseDown={close}>
+    <div
+      data-closing={closing || undefined}
+      className="u-overlay fixed inset-0 z-[90] flex items-start justify-center overscroll-contain bg-scrim px-4 pt-[12vh] backdrop-blur-sm"
+      onMouseDown={close}
+    >
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={label}
-        className={cn('flex w-full max-w-[600px] flex-col overflow-hidden rounded-sheet border border-line bg-card shadow-modal', className)}
+        data-closing={closing || undefined}
+        className={cn('u-palette flex w-full max-w-[600px] flex-col overflow-hidden rounded-sheet border border-line bg-card shadow-modal', className)}
         onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-3 border-b border-line px-4">

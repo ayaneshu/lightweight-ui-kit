@@ -92,6 +92,53 @@ html {
   }
 }
 
+/* A theme change spreads out from where it was asked for, as a circle (App.tsx
+   drives the clip). Only the root snapshot takes part: the page and the nav
+   pill drop their own names for the moment, so the whole window turns at once. */
+.pg-theme-vt .pg-page,
+.pg-theme-vt .pg-nav-pill {
+  view-transition-name: none;
+}
+
+/* The phone nav drawer slides in from the edge it lives on, on the iOS drawer
+   curve, and slides back out a little faster. */
+.pg-drawer {
+  transition: transform 280ms var(--ease-drawer);
+}
+@starting-style {
+  .pg-drawer {
+    transform: translateX(-100%);
+  }
+}
+.pg-drawer[data-closing] {
+  transform: translateX(-100%);
+  transition-duration: 200ms;
+}
+[dir='rtl'] .pg-drawer[data-closing] {
+  transform: translateX(100%);
+}
+@starting-style {
+  [dir='rtl'] .pg-drawer {
+    transform: translateX(100%);
+  }
+}
+
+/* Open and close a block to its natural height: the grid row goes between 0fr
+   and 1fr, so nothing has to be measured. The child needs min-height: 0 and
+   overflow: hidden. Closing is quicker than opening. */
+.pg-collapse {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 240ms var(--ease-out),
+    opacity 200ms var(--ease-out);
+}
+.pg-collapse[data-collapsed] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition-duration: 180ms, 120ms;
+}
+
 /* The Overview's "Explore the kit" arrow: a slow nudge toward what's below. */
 @media (prefers-reduced-motion: no-preference) {
   .u-scroll-cue {

@@ -10,6 +10,23 @@ Write notes under Unreleased as you work. `npm run release` turns them into the 
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-08
+
+### Changed
+
+- `CommandMenu` now has open and close motion. It settles in over 150ms, from slightly smaller and a few pixels above where it lands, over a fading scrim, and closes in 100ms. Focus is in the field from the first frame, so typing is never held up, and nothing moves while you type or move through results.
+- The playground has more motion:
+  - Changing the theme spreads the new one out from the switch you pressed.
+  - The phone navigation drawer slides in from its edge, and the menu button's icon turns into a close icon.
+  - Sidebar groups and demo code panels open and close to their height instead of snapping.
+  - "On this page" has one tick that slides to the current section.
+  - The icon details panel stays put while you move between icons and slides away when you close it.
+  - Copy buttons ease their icon back in after "Copied".
+
+### Fixed
+
+- Changing pages in a background tab no longer logs "Transition was aborted" errors in the playground's console.
+
 ## [0.2.0] - 2026-09-28
 
 ### Added
@@ -37,6 +54,7 @@ Write notes under Unreleased as you work. `npm run release` turns them into the 
 - Corners now match in browsers without `corner-shape`, like Safari and Firefox, instead of looking much rounder.
 - Playground demos and code blocks have their hairlines back.
 
-[Unreleased]: https://github.com/ayaneshu/lightweight-ui-kit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ayaneshu/lightweight-ui-kit/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/ayaneshu/lightweight-ui-kit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/ayaneshu/lightweight-ui-kit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ayaneshu/lightweight-ui-kit/releases/tag/v0.1.0
