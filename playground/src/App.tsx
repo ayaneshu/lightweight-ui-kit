@@ -108,44 +108,25 @@ function quiet(vt: ViewTransition) {
   return vt
 }
 
-/* ------------------------------------------------------------ Theme reveal */
-
-/** Where the pointer last went down — a theme change spreads out from there. */
-let lastPointer: { x: number; y: number; at: number } | null = null
-if (typeof window !== 'undefined') {
-  window.addEventListener('pointerdown', (e) => (lastPointer = { x: e.clientX, y: e.clientY, at: e.timeStamp }), { capture: true, passive: true })
-}
+/* ------------------------------------------------------------ Theme change */
 
 /**
- * Switch theme inside a view transition, revealing the new one as a circle
- * that grows from the switch you pressed (or the focused control, for the
- * keyboard and ⌘K). It's rare and it's the whole window, so it can take a
- * little longer than a control would — 400ms, all ease-out, so most of the
- * change lands in the first 150. When nothing visible changes (Light → System
- * on a light OS), or motion is reduced, it just switches.
+ * Switch theme inside a view transition, so the whole window crossfades from
+ * one theme to the other in one piece — 250ms on a plain ease, the curve for a
+ * colour change. Nothing travels across the screen, so no corner lags behind
+ * the rest; it's opacity only, so it stays smooth on a big screen and still
+ * plays with reduced motion on. When nothing visible changes (Light → System
+ * on a light OS) it just switches.
  */
-function useThemeReveal(): [Theme, (t: Theme) => void] {
+function useThemeChange(): [Theme, (t: Theme) => void] {
   const [theme, setNow, resolved] = useTheme()
   const set = useCallback(
     (next: Theme) => {
       const to = next === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : next
-      if (to === resolved || !canTransition || reduceMotion()) return setNow(next)
-      const recent = lastPointer && performance.now() - lastPointer.at < 1000
-      const focus = document.activeElement !== document.body ? document.activeElement?.getBoundingClientRect() : undefined
-      const x = recent ? lastPointer!.x : focus ? focus.left + focus.width / 2 : window.innerWidth / 2
-      const y = recent ? lastPointer!.y : focus ? focus.top + focus.height / 2 : 0
-      const r = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
+      if (to === resolved || !canTransition) return setNow(next)
       const root = document.documentElement
       root.classList.add('pg-theme-vt')
       const vt = quiet(document.startViewTransition(() => flushSync(() => setNow(next))))
-      vt.ready
-        .then(() =>
-          root.animate(
-            { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${r}px at ${x}px ${y}px)`] },
-            { duration: 400, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', pseudoElement: '::view-transition-new(root)' },
-          ),
-        )
-        .catch(() => {})
       vt.finished.finally(() => root.classList.remove('pg-theme-vt')).catch(() => {})
     },
     [resolved, setNow],
@@ -169,7 +150,7 @@ export default function App() {
   const [drawer, setDrawer] = useState(false)
   const { mounted: drawerMounted, closing: drawerClosing } = usePresence(drawer, 200)
   // One theme state for the whole app, so every switch shows the same choice.
-  const [theme, setTheme] = useThemeReveal()
+  const [theme, setTheme] = useThemeChange()
   const [searching, setSearching] = useState(false)
   const current = PAGES.find((p) => p.slug === slug) ?? PAGES[0]
   const index = PAGES.indexOf(current)
